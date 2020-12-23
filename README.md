@@ -1,2 +1,2 @@
 # jf_legis
-web scrapper para valiar quão inúteis são nossos vereadores
+web scrapper para avaliar quão inúteis são nossos vereadores
