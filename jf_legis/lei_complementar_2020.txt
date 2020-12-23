@@ -1,0 +1,582 @@
+<html lang="pt-br"><head>
+		<title>Portal PJF | JFLegis - Consulta</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="Keywords" content="jflegis, legislação, município, pjf, prefeitura, juiz, de, fora, jf">
+	<meta name="Description" content="Sistema de Consulta à Legislação Municipal">
+	<link rel="stylesheet" type="text/css" href="view/css/jAlert.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+	<link href="bootstrap/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="view/css/loader.css">
+	<style>
+		/* Remove the navbar's default margin-bottom and rounded borders */ 
+		.navbar { margin-bottom: 0; border-radius: 0; }
+		
+		/* Add a gray background color and some padding to the footer */
+		footer { background-color: #f2f2f2; padding: 25px; }
+		
+		/** Logo **/
+		#header  {
+			/*background-color: rgb(235,235,235);*/
+			/*border-bottom: 1px solid #e6e6e6;*/
+			background: #38A8A2;
+			background-size: cover;
+			color: #ffffff;
+			padding: 10px;
+			border-radius: 4px;
+		}
+		
+		#selo_pjf { font-size:22px; }
+		@media screen and (max-width: 768px) {
+			#selo_pjf { font-size:12px; font-weight:bold }
+			#selo_pjf h5 { font-size:12px }
+			#selo_pjf p { text-transform:uppercase }
+			#selo_pjf img { width:80px }
+		}
+	</style>
+</head>
+<body>
+	
+<!--class="navbar navbar-inverse" style="background-color: rgb(235,235,235) !important; border-bottom: 1px solid #e6e6e6 !important" -->
+<nav>
+	<div class="container-fluid">
+		<div id="header">
+			<div id="selo_pjf">
+				<!--<img class="img-responsive" style="margin:0 auto" src="view/img/banner-seplag.png">-->
+				<a href="//www.pjf.mg.gov.br"><img src="view/img/selo_pjf.png" class="img-responsive no-print" style="margin:0 auto"></a>
+				<center><p style="margin-top:5px;margin-bottom:0">Sistema de Consulta à Legislação Municipal</p><h5 style="margin-top:5px;margin-bottom:0">Permite consultar Leis, Decretos e Portarias</h5></center>
+			</div>
+		</div>
+	</div>
+</nav>
+  
+<div id="preloader" style="display: none;">
+	<div id="status" style="display: none;">&nbsp;</div>
+</div>  
+
+<div class="container-fluid bg-3 text-center">    
+	<br>
+		
+		<div class="row">
+			<div class="col-sm-4 no-print" style="margin-top:10px">	
+				<form class="form-horizontal" method="post" action="indexConsulta.php?pesq=1#tbr" name="form_1" id="form_1" onsubmit="return validaDatas()">	
+					<div class="form-group">
+						<label class="control-label col-sm-5">Consultar por:</label>
+						<div class="col-sm-6" style="text-align:left">
+							<select class="form-control" id="op" name="op" onchange="mudaDivOpcao()">
+								<option value="1">Número</option>
+								<option value="2" selected="">Período</option>
+								<option value="3">Palavras-chave</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-5">Tipo de Norma</label>
+						<div class="col-sm-6">
+							<select class="form-control" id="cod_tipo_norma" name="cod_tipo_norma">
+								<option value="TODOS">Todos os Tipos</option>
+																	<option value="DECRE">Decreto do Executivo</option>									<option value="EMEND">Emenda à Lei Orgânica</option>									<option value="LEI">Lei</option>									<option value="LCOM" selected="">Lei Complementar</option>									<option value="PORT">Portaria</option>									<option value="PDIRE">Portaria do Diretor</option>									<option value="RESOL">Resolução</option>							</select>
+						</div>
+					</div>
+					<div class="form-group" id="opcao_1" style="display: none;">
+						<label class="control-label col-sm-5" style="color:#880015">Número</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="numero" id="cmpNumero" maxlength="5" pattern="[0-9]{1,}$" autocomplete="off" style="vertical-align:-2px" onkeypress="return numeros(event)">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_2" style="display: none;">
+						<label class="control-label col-sm-5">Complemento</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="numero_comp" id="cmpNumeroComp" maxlength="1" pattern="[a-zA-Z]{1}$" title="Apenas letras, sem acento" autocomplete="off" style="vertical-align:-2px" onkeyup="maiusculo(this)">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_3" style="">
+						<label class="control-label col-sm-5" id="labelDataInicial" style="color: rgb(136, 0, 21);">Data Inicial</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="data_inicial" id="cmpDataInicial" data-inputmask="'alias':'dd/mm/yyyy','placeholder':'__/__/____'" data-mask="" pattern="([0-9]{2})/[0-9]{2}/[0-9]{4}$" required="required">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_4" style="">
+						<label class="control-label col-sm-5" id="labelDataFinal" style="color: rgb(136, 0, 21);">Data Final</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="data_final" id="cmpDataFinal" data-inputmask="'alias':'dd/mm/yyyy','placeholder':'__/__/____'" data-mask="" pattern="([0-9]{2})/[0-9]{2}/[0-9]{4}$" required="required">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_5" style="display:none">	
+						<label class="control-label col-sm-5" style="color:#880015">Palavra(s) Chave</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="pchave" id="cmpPalavra" maxlength="40" pattern="[A-Za-zÀ-ú 0-9]{4,}" title="Mínimo de 4 caracteres (apenas alpha-numericos)" autocomplete="off" style="vertical-align:-2px">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_6" style="display:none">
+						<label class="control-label col-sm-5">Tipo de consulta:</label>
+						<div class="col-sm-7" style="text-align:left">
+							<input type="radio" name="tipoConsulta" id="cmpTipoConsultaOp1" value="plv" style="vertical-align:-7px"><label for="cmpTipoConsultaOp1" style="vertical-align:-7px;font-weight:normal">&nbsp;Todas palavras</label>&nbsp;&nbsp;<input type="radio" name="tipoConsulta" id="cmpTipoConsultaOp2" value="frs" style="vertical-align:-7px" checked=""><label for="cmpTipoConsultaOp2" style="vertical-align:-7px;font-weight:normal">&nbsp;Frase exata</label>
+						</div>
+					</div>
+					<div class="form-group" id="divCaptcha">
+						<label class="control-label col-sm-6"><img src="captcha.php?pesq=1" style="border-radius:4px" title="Código de segurança">&nbsp;<img src="view/img/refresh.jpg" title="Gerar novo código" style="cursor:pointer" onclick="regerarCaptcha()"></label>
+						<div class="col-sm-5">
+							<input type="text" class="form-control" style="margin-top:10px" name="security_code" id="security_code" maxlength="5" pattern="[a-zA-Z0-9]{5}$" placeholder="Digite o código" title="Código de segurança" autocomplete="off" required="">
+						</div>
+					</div>
+					<div class="form-group">
+						<br>
+						<div class="col-sm-12"><!-- pull-right -->
+														
+							<input type="hidden" name="token" value="80191937c1b23d99063fbda393c07a29">
+							<input type="hidden" id="cmpOp_hidden" value="2">
+							<input type="hidden" id="cmpCodTipoNorma_hidden" value="LCOM">
+							<input type="hidden" id="cmpNumero_hidden" value="">
+							<input type="hidden" id="cmpNumeroComp_hidden" value="">
+							<input type="hidden" id="cmpDataInicial_hidden" value="01/01/2020">
+							<input type="hidden" id="cmpDataFinal_hidden" value="22/12/2020">
+							<input type="hidden" id="cmpPalavra_hidden" value="">
+							<input type="hidden" id="cmpTipoConsulta_hidden" value="frs">
+							<input type="hidden" id="security_code_hidden" value="6009e">
+							<center>
+								<!--								
+								<button type="button" class="btn" onclick="ajuda()">Ajuda</button>
+								&nbsp;-->
+								<input type="button" class="btn btn-default" value="Limpar" onclick="limpa()">
+								&nbsp;
+								<input type="submit" class="btn btn-primary" id="btnConsultar" value="Consultar">
+								&nbsp;&nbsp;
+								<i class="fa fa-question-circle fa-2x" style="cursor:pointer" title="Ajuda" onclick="ajuda()"></i>
+							</center>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-8">
+				<div id="tbr" class="table-responsive"><table width="100%" bgcolor="#999999" class="table table-bordered table-striped h6">
+				<tbody><tr style="display:none">
+					<td colspan="2">Total de normas encontradas:&nbsp;<span id="spanTotalReg" style="font-weight:bold">18</span></td>
+				</tr>
+			
+				<tr>
+					<th style="text-align:left;color:#FFFFFF;background-color:#999999">QTD</th>
+					<th style="text-align:left;color:#FFFFFF;background-color:#999999">Normas</th>
+				</tr>
+					<tr style="background:">
+			<td align="center" style="vertical-align:middle">1</td>
+			<td>
+				<a href="norma.php?chave=0000045135" target="_blank" style="font-weight:bold">
+					Lei Complementar 00109   de 03/03/2020				</a>
+								<br>
+				Altera a Lei nº 6.910, de 31 de maio de 1986 e suas alterações posteriores, quanto ao uso e ocupação do solo.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">2</td>
+			<td>
+				<a href="norma.php?chave=0000045167" target="_blank" style="font-weight:bold">
+					Lei Complementar 00110   de 19/03/2020				</a>
+								<br>
+				Dispõe sobre o Estudo de Impacto de Vizinhança (EIV).			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">3</td>
+			<td>
+				<a href="norma.php?chave=0000045251" target="_blank" style="font-weight:bold">
+					Lei Complementar 00111   de 08/04/2020				</a>
+								<br>
+				Altera a Lei nº 6.910, de 31 de maio de 1986, e a Lei Complementar nº 6, de 27 de novembro de 2013, quanto ao uso e ocupação do solo no Bairro Aeroporto.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">4</td>
+			<td>
+				<a href="norma.php?chave=0000045252" target="_blank" style="font-weight:bold">
+					Lei Complementar 00112   de 08/04/2020				</a>
+								<br>
+				Altera a Lei nº 6.910, de 31 de maio de 1986.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">5</td>
+			<td>
+				<a href="norma.php?chave=0000045268" target="_blank" style="font-weight:bold">
+					Lei Complementar 00113   de 15/04/2020				</a>
+								<br>
+				Altera a Lei nº 6.910, de 31 de maio de 1986.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">6</td>
+			<td>
+				<a href="norma.php?chave=0000045271" target="_blank" style="font-weight:bold">
+					Lei Complementar 00114   de 15/04/2020				</a>
+								<br>
+				Dispõe sobre a alteração da Lei nº 6.910, de 31 de maio de 1986 e as modificações posteriores.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">7</td>
+			<td>
+				<a href="norma.php?chave=0000045495" target="_blank" style="font-weight:bold">
+					Lei Complementar 00115   de 04/07/2020				</a>
+								<br>
+				Dispõe sobre a reestruturação do Regime Próprio de Previdência Social do Município de Juiz de Fora, criação da Unidade Gestora Única sob a modelagem de Autarquia Previdenciária e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">8</td>
+			<td>
+				<a href="norma.php?chave=0000045525" target="_blank" style="font-weight:bold">
+					Lei Complementar 00116   de 16/07/2020				</a>
+								<br>
+				Altera as Leis nº 8.710, de 31 de julho de 1995, que “Dispõe sobre o Estatuto dos Servidores Públicos da administração direta do Município de Juiz de Fora, de suas autarquias e fundações públicas” e nº 12.043, de 02 de junho de 2010, que “Dispõe sobre a contratação temporária de excepcional interesse público de pessoal para integrar Programas do Governo Federal e Estadual” e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">9</td>
+			<td>
+				<a href="norma.php?chave=0000045736" target="_blank" style="font-weight:bold">
+					Lei Complementar 00117   de 25/08/2020				</a>
+								<br>
+				Altera a Lei nº 6.910, de 31 de maio de 1986, e a Lei Complementar nº 6, de 27 de novembro de 2013.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">10</td>
+			<td>
+				<a href="norma.php?chave=0000045737" target="_blank" style="font-weight:bold">
+					Lei Complementar 00118   de 26/08/2020				</a>
+								<br>
+				Dispõe sobre o cálculo de número de compartimentos sanitários em edificações não residenciais.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">11</td>
+			<td>
+				<a href="norma.php?chave=0000045765" target="_blank" style="font-weight:bold">
+					Lei Complementar 00120   de 02/09/2020				</a>
+								<br>
+				Inclui Zona de Urbanização Específica do Município.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">12</td>
+			<td>
+				<a href="norma.php?chave=0000045766" target="_blank" style="font-weight:bold">
+					Lei Complementar 00119   de 02/09/2020				</a>
+								<br>
+				Altera a Lei nº 12.450, de 26 de dezembro de 2011, a Lei nº 6.910, de 31 de maio de 1986, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">13</td>
+			<td>
+				<a href="norma.php?chave=0000045846" target="_blank" style="font-weight:bold">
+					Lei Complementar 00121   de 24/09/2020				</a>
+								<br>
+				Altera o Anexo 7 da Lei Municipal nº 6.910, de 31 de maio de 1986, e suas alterações posteriores, que dispõe sobre o ordenamento do uso e ocupação do solo no Município de Juiz de Fora, inserindo as atividades que menciona.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">14</td>
+			<td>
+				<a href="norma.php?chave=0000045880" target="_blank" style="font-weight:bold">
+					Lei Complementar 00122   de 28/09/2020				</a>
+								<br>
+				Cria normas para certificação e divulgação da qualidade de água de fontes alternativas usada para consumo humano.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">15</td>
+			<td>
+				<a href="norma.php?chave=0000045881" target="_blank" style="font-weight:bold">
+					Lei Complementar 00123   de 30/09/2020				</a>
+								<br>
+				Altera categoria de uso de loteamentos na região do Bairro Bom Pastor.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">16</td>
+			<td>
+				<a href="norma.php?chave=0000046054" target="_blank" style="font-weight:bold">
+					Lei Complementar 00124   de 04/11/2020				</a>
+								<br>
+				Altera a Lei nº 6.910, de 31 de maio de 1986, inserindo a atividade que menciona no anexo 7.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">17</td>
+			<td>
+				<a href="norma.php?chave=0000046055" target="_blank" style="font-weight:bold">
+					Lei Complementar 00125   de 05/11/2020				</a>
+								<br>
+				Altera a Lei nº 6.910, de 31 de maio de 1986.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">18</td>
+			<td>
+				<a href="norma.php?chave=0000046056" target="_blank" style="font-weight:bold">
+					Lei Complementar 00126   de 05/11/2020				</a>
+								<br>
+				Altera a Lei nº 6.910, de 31 de maio de 1986.			</td>
+		</tr>
+		<input type="hidden" id="totalReg" value="18"></tbody></table></div>
+			</div>
+		</div>
+				<br><br>
+		<div class="alert alert-info no-print" style="text-align:left">
+			→ Para consultar, informe ao menos os campos obrigatórios (em vermelho) e o código de segurança.
+		</div></div>
+
+<footer class="container-fluid text-center">
+	<div class="no-print">
+		<p class="text-muted">Prefeitura de Juiz de Fora. Todos os direitos reservados. Copyright © 2020</p>
+	</div>
+</footer>
+
+<script type="text/javascript" src="view/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="view/js/jquery.inputmask.js"></script>
+<script type="text/javascript" src="view/js/jquery.inputmask.date.extensions.js"></script>
+<script type="text/javascript" src="view/js/jAlert.js"></script>
+<script type="text/javascript" src="view/js/jAlert-functions.js"></script>
+
+<script type="text/javascript">
+	function regerarCaptcha(){
+		$("#form_1").attr("action", "indexConsulta.php?rgc=1#tbr");
+		$("#form_1").attr("onSubmit", "");
+		$("#form_1").submit();
+	}
+	
+	function ajuda(){
+		$.jAlert({
+			'title': "Sistema JFLegis - Ajuda",
+			'iframe': 'ajuda.htm',
+			'iframeHeight': '340px',
+			//'theme': 'dark_green',
+			'size': 'md'
+		});
+	}
+	
+	function limpa(){
+		$('#cod_tipo_norma').find('option:eq(0)').prop('selected', true);
+		var op = $("#cmpOp_hidden").val();
+		if(op == "3"){//palavra
+			$("#op").val("3");
+			$("#cmpDataInicial").val("");
+			$("#cmpDataFinal").val("");
+			$("#cmpPalavra").val("");
+			$('input:radio[name=tipoConsulta]')[1].checked = true;
+			$('#cmpPalavra').focus();
+		}
+		else if(op == "2"){//periodo
+			$("#op").val("2");
+			$("#cmpDataInicial").val("");
+			$("#cmpDataFinal").val("");
+			$('#cmpDataInicial').focus();
+		}
+		else //numero
+		{
+			$("#op").val("1");
+			$("#cmpNumero").val("");
+			$("#cmpNumeroComp").val("");
+			$('#cmpNumero').focus();
+		}
+		//$('#security_code').prop('readonly',false);
+		//$('#security_code').css('color','');
+		//$('#security_code').css('background-color','#fff');
+		//$('#security_code').css('cursor','text');
+		$("#security_code").val("");
+		document.getElementById("tbr").innerHTML = '';
+	}
+	
+	function erroConsulta(){
+		document.getElementById("tbr").innerHTML = "<div class='alert alert-danger alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Ops!</strong> Erro ao realizar a consulta. Por favor, tente novamente mais tarde.</div>";
+	}
+	
+	function resultadoConsulta(retorno){
+		var msg = retorno.substr(0,6);
+		if(msg == 'Nenhum')
+			document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Ops!</strong> Nenhum registro encontrado. Verifique os dados informados e tente novamente.</div>";
+		else if(retorno == "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o!</strong> C&oacute;digo de seguran&ccedil;a n&atilde;o confere. Verifique os caracteres digitados.</div>"){
+			document.getElementById("tbr").innerHTML = retorno;
+			//$('#security_code').prop('readonly',false);
+			//$('#security_code').css('color','');
+			//$('#security_code').css('background-color','#fff');
+			//$('#security_code').css('cursor','text');
+		}
+		else
+		{
+			document.getElementById("tbr").innerHTML = retorno;
+			document.getElementById("spanTotalReg").innerHTML = document.getElementById("totalReg").value;
+		}
+	}
+	
+	function maiusculo(Campo){
+		var vr = String(Campo.value);
+		Campo.value = vr.toUpperCase();
+	}
+	
+	function numeros(e){
+		var tecla=(window.event)?event.keyCode:e.which;
+		if((tecla > 47 && tecla < 58)) return true;//numeros
+		else
+		{
+			if (tecla == 8 || tecla == 0 || tecla == 13) return true;//backspace, delete e enter
+			else return false;
+		}
+	}
+	
+	function dataHoje(formato){
+		var data = new Date();
+		var ano  = data.getFullYear();
+		var mes  = (data.getMonth() + 1);
+		if(mes < '10'){ mes = 0 +''+ mes; }
+		var dia  = data.getDate();
+		if(dia < '10'){ dia = 0 +''+ dia; }
+		var hora = data.getHours();
+		if(formato == '1')
+			return dia +'/'+ mes +'/'+ ano;
+		else
+			return ano +''+ mes +''+ dia;
+	}
+	
+	function mudaDivOpcao(){
+		var op = $("#op option:selected").val();
+		if(op == '1')//numero
+		{
+			$("#opcao_1, #opcao_2").show();
+			$("#opcao_3, #opcao_4, #opcao_5, #opcao_6").hide();
+			$("#cmpNumero").attr("required",true);
+			$("#cmpDataInicial, #cmpDataFinal, #cmpPalavra").attr("required",false);
+			$("#cmpNumero, #cmpNumeroComp").val("");
+			$(".alert-warning").remove();
+			$("#cmpOp_hidden").val(op);
+		}
+		
+		if(op == '2')//periodo
+		{
+			$("#opcao_3, #opcao_4").show();
+			$("#opcao_1, #opcao_2, #opcao_5, #opcao_6").hide();
+			$("#labelDataInicial, #labelDataFinal").css("color","880015");
+			$("#cmpDataInicial, #cmpDataFinal").attr("required",true);
+			$("#cmpNumero, #cmpPalavra").attr("required",false);
+			$("#cmpDataInicial").val("");
+			$(".alert-warning").remove();
+			$("#cmpOp_hidden").val(op);
+		}
+		
+		if(op == '3')//palavra
+		{
+			$("#opcao_3, #opcao_4, #opcao_5, #opcao_6").show();
+			$("#opcao_1, #opcao_2").hide();
+			$("#labelDataInicial, #labelDataFinal").css("color","");
+			$("#cmpPalavra").attr("required",true);
+			$("#cmpNumero, #cmpDataInicial, #cmpDataFinal").attr("required",false);
+			$("#cmpDataInicial, #cmpDataFinal").val("");
+			$(".alert-warning").remove();
+			$("#cmpOp_hidden").val(op);
+		}
+		
+					if(op == '3'){
+				$("[data-mask]").inputmask();
+				$('#cmpDataFinal').val("");
+				$("#cmpPalavra").focus();
+			}
+			else if(op == '2'){
+				$("[data-mask]").inputmask();
+				$('#cmpDataFinal').val( dataHoje('1') );
+				$("#cmpDataInicial").focus();
+			}
+			else $("#cmpNumero").focus();
+				}
+
+	function validaDatas(){
+		if( $("#cmpOp_hidden").val() > "1" && ($("#cmpDataInicial").val().length == "10" || $("#cmpDataFinal").val().length == "10") ){
+		
+			//Verifica se data_final > que data_inicial
+			dia_d1 = $("#cmpDataInicial").val().substring(0,2); 
+			mes_d1 = $("#cmpDataInicial").val().substring(3,5); 
+			ano_d1 = $("#cmpDataInicial").val().substring(6,10); 
+			d1 = ano_d1 +''+ mes_d1 +''+ dia_d1;
+			
+			dia_d2 = $("#cmpDataFinal").val().substring(0,2); 
+			mes_d2 = $("#cmpDataFinal").val().substring(3,5); 
+			ano_d2 = $("#cmpDataFinal").val().substring(6,10);
+			
+			d2 = ano_d2 +''+ mes_d2 +''+ dia_d2;
+			
+			if ( $("#cmpDataInicial").val().length == "10" && $("#cmpDataFinal").val().length == "0" ) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Informe a Data Final.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataFinal").focus();
+				return false;
+			}
+			
+			if ( $("#cmpDataFinal").val().length == "10" && $("#cmpDataInicial").val().length == "0" ) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Informe a Data Inicial.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataInicial").focus();
+				return false;
+			}
+			
+			if (d2 < d1) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Data Final deve ser maior que a Data Inicial.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataFinal").focus();
+				return false;
+			}
+			
+			if (d2 > dataHoje('2')) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Data Final n&atilde;o pode ser maior que a data atual.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataFinal").focus();
+				return false;
+			}
+			
+			// Verifica Ano
+			ano_d1 = $("#cmpDataInicial").val().substring(6,10);
+			ano_d2 = $("#cmpDataFinal").val().substring(6,10);
+			if ( (ano_d2 - ano_d1) != 0 ) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Datas Inicial e Final devem ser do mesmo ano. Ex.: 01/01/1987 até 31/12/1987.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataInicial").focus();
+				return false;
+			}
+		}
+		else return true;
+	}
+	
+	// makes sure the whole site is loaded
+	$(window).on('load',function() {
+		//will first fade out the loading animation
+		$("#status").fadeOut();
+		//will fade out the whole DIV that covers the website.
+		$("#preloader").delay(0).fadeOut("fast");
+	});
+	
+	$(document).ready(function(){
+		 mudaDivOpcao();   $('#cmpCodTipoNorma').val("LCOM");  $('#cmpDataInicial').val("01/01/2020");  $('#cmpDataFinal').val("22/12/2020"); 
+				//$('#security_code').prop('readonly',true);
+				//$('#security_code').css('color','#999');
+				//$('#security_code').css('background-color','#eee');
+				//$('#security_code').css('cursor','no-drop');
+				$('#security_code').val("6009e");
+				});
+</script>
+
+	<script>
+		document.getElementById("tbr").innerHTML = "<img src='view/img/carregando.gif'>&nbsp;Buscando...";
+		
+		var dados = {
+			cmpOp: $("#cmpOp_hidden").val(),
+			cmpCodTipoNorma: $("#cmpCodTipoNorma_hidden").val(),
+			cmpNumero: $("#cmpNumero_hidden").val(),
+			cmpNumeroComp: $("#cmpNumeroComp_hidden").val(),
+			cmpDataInicial: $("#cmpDataInicial_hidden").val(),
+			cmpDataFinal: $("#cmpDataFinal_hidden").val(),
+			cmpPalavra: $("#cmpPalavra_hidden").val(),
+			cmpTipoConsulta: $("#cmpTipoConsulta_hidden").val(),
+			security_code: $("#security_code_hidden").val()
+		};
+		
+		$.ajax({
+			type: "POST",
+			url: "consulta.php",
+			data: dados,
+			success: function(retorno) {
+				if(retorno == "")
+					erroConsulta();
+				else
+					resultadoConsulta(retorno);
+			},
+			error: function() {
+				erroConsulta();
+			}
+		});
+	</script>
+	
+
+</body></html>

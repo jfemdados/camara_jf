@@ -1,0 +1,1502 @@
+<html lang="pt-br"><head>
+		<title>Portal PJF | JFLegis - Consulta</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="Keywords" content="jflegis, legislação, município, pjf, prefeitura, juiz, de, fora, jf">
+	<meta name="Description" content="Sistema de Consulta à Legislação Municipal">
+	<link rel="stylesheet" type="text/css" href="view/css/jAlert.css">
+	<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
+	<link href="bootstrap/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="view/css/loader.css">
+	<style>
+		/* Remove the navbar's default margin-bottom and rounded borders */ 
+		.navbar { margin-bottom: 0; border-radius: 0; }
+		
+		/* Add a gray background color and some padding to the footer */
+		footer { background-color: #f2f2f2; padding: 25px; }
+		
+		/** Logo **/
+		#header  {
+			/*background-color: rgb(235,235,235);*/
+			/*border-bottom: 1px solid #e6e6e6;*/
+			background: #38A8A2;
+			background-size: cover;
+			color: #ffffff;
+			padding: 10px;
+			border-radius: 4px;
+		}
+		
+		#selo_pjf { font-size:22px; }
+		@media screen and (max-width: 768px) {
+			#selo_pjf { font-size:12px; font-weight:bold }
+			#selo_pjf h5 { font-size:12px }
+			#selo_pjf p { text-transform:uppercase }
+			#selo_pjf img { width:80px }
+		}
+	</style>
+</head>
+<body>
+	
+<!--class="navbar navbar-inverse" style="background-color: rgb(235,235,235) !important; border-bottom: 1px solid #e6e6e6 !important" -->
+<nav>
+	<div class="container-fluid">
+		<div id="header">
+			<div id="selo_pjf">
+				<!--<img class="img-responsive" style="margin:0 auto" src="view/img/banner-seplag.png">-->
+				<a href="//www.pjf.mg.gov.br"><img src="view/img/selo_pjf.png" class="img-responsive no-print" style="margin:0 auto"></a>
+				<center><p style="margin-top:5px;margin-bottom:0">Sistema de Consulta à Legislação Municipal</p><h5 style="margin-top:5px;margin-bottom:0">Permite consultar Leis, Decretos e Portarias</h5></center>
+			</div>
+		</div>
+	</div>
+</nav>
+  
+<div id="preloader" style="display: none;">
+	<div id="status" style="display: none;">&nbsp;</div>
+</div>  
+
+<div class="container-fluid bg-3 text-center">    
+	<br>
+		
+		<div class="row">
+			<div class="col-sm-4 no-print" style="margin-top:10px">	
+				<form class="form-horizontal" method="post" action="indexConsulta.php?pesq=1#tbr" name="form_1" id="form_1" onsubmit="return validaDatas()">	
+					<div class="form-group">
+						<label class="control-label col-sm-5">Consultar por:</label>
+						<div class="col-sm-6" style="text-align:left">
+							<select class="form-control" id="op" name="op" onchange="mudaDivOpcao()">
+								<option value="1">Número</option>
+								<option value="2" selected="">Período</option>
+								<option value="3">Palavras-chave</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-5">Tipo de Norma</label>
+						<div class="col-sm-6">
+							<select class="form-control" id="cod_tipo_norma" name="cod_tipo_norma">
+								<option value="TODOS">Todos os Tipos</option>
+																	<option value="DECRE">Decreto do Executivo</option>									<option value="EMEND">Emenda à Lei Orgânica</option>									<option value="LEI" selected="">Lei</option>									<option value="LCOM">Lei Complementar</option>									<option value="PORT">Portaria</option>									<option value="PDIRE">Portaria do Diretor</option>									<option value="RESOL">Resolução</option>							</select>
+						</div>
+					</div>
+					<div class="form-group" id="opcao_1" style="display: none;">
+						<label class="control-label col-sm-5" style="color:#880015">Número</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="numero" id="cmpNumero" maxlength="5" pattern="[0-9]{1,}$" autocomplete="off" style="vertical-align:-2px" onkeypress="return numeros(event)">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_2" style="display: none;">
+						<label class="control-label col-sm-5">Complemento</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="numero_comp" id="cmpNumeroComp" maxlength="1" pattern="[a-zA-Z]{1}$" title="Apenas letras, sem acento" autocomplete="off" style="vertical-align:-2px" onkeyup="maiusculo(this)">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_3" style="">
+						<label class="control-label col-sm-5" id="labelDataInicial" style="color: rgb(136, 0, 21);">Data Inicial</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="data_inicial" id="cmpDataInicial" data-inputmask="'alias':'dd/mm/yyyy','placeholder':'__/__/____'" data-mask="" pattern="([0-9]{2})/[0-9]{2}/[0-9]{4}$" required="required">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_4" style="">
+						<label class="control-label col-sm-5" id="labelDataFinal" style="color: rgb(136, 0, 21);">Data Final</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="data_final" id="cmpDataFinal" data-inputmask="'alias':'dd/mm/yyyy','placeholder':'__/__/____'" data-mask="" pattern="([0-9]{2})/[0-9]{2}/[0-9]{4}$" required="required">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_5" style="display:none">	
+						<label class="control-label col-sm-5" style="color:#880015">Palavra(s) Chave</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" name="pchave" id="cmpPalavra" maxlength="40" pattern="[A-Za-zÀ-ú 0-9]{4,}" title="Mínimo de 4 caracteres (apenas alpha-numericos)" autocomplete="off" style="vertical-align:-2px">
+						</div>
+					</div>
+					<div class="form-group" id="opcao_6" style="display:none">
+						<label class="control-label col-sm-5">Tipo de consulta:</label>
+						<div class="col-sm-7" style="text-align:left">
+							<input type="radio" name="tipoConsulta" id="cmpTipoConsultaOp1" value="plv" style="vertical-align:-7px"><label for="cmpTipoConsultaOp1" style="vertical-align:-7px;font-weight:normal">&nbsp;Todas palavras</label>&nbsp;&nbsp;<input type="radio" name="tipoConsulta" id="cmpTipoConsultaOp2" value="frs" style="vertical-align:-7px" checked=""><label for="cmpTipoConsultaOp2" style="vertical-align:-7px;font-weight:normal">&nbsp;Frase exata</label>
+						</div>
+					</div>
+					<div class="form-group" id="divCaptcha">
+						<label class="control-label col-sm-6"><img src="captcha.php?pesq=1" style="border-radius:4px" title="Código de segurança">&nbsp;<img src="view/img/refresh.jpg" title="Gerar novo código" style="cursor:pointer" onclick="regerarCaptcha()"></label>
+						<div class="col-sm-5">
+							<input type="text" class="form-control" style="margin-top:10px" name="security_code" id="security_code" maxlength="5" pattern="[a-zA-Z0-9]{5}$" placeholder="Digite o código" title="Código de segurança" autocomplete="off" required="">
+						</div>
+					</div>
+					<div class="form-group">
+						<br>
+						<div class="col-sm-12"><!-- pull-right -->
+														
+							<input type="hidden" name="token" value="ba263c4cd1c9ebeb6751f6fe2fa7be51">
+							<input type="hidden" id="cmpOp_hidden" value="2">
+							<input type="hidden" id="cmpCodTipoNorma_hidden" value="LEI">
+							<input type="hidden" id="cmpNumero_hidden" value="">
+							<input type="hidden" id="cmpNumeroComp_hidden" value="">
+							<input type="hidden" id="cmpDataInicial_hidden" value="01/01/2020">
+							<input type="hidden" id="cmpDataFinal_hidden" value="14/12/2020">
+							<input type="hidden" id="cmpPalavra_hidden" value="">
+							<input type="hidden" id="cmpTipoConsulta_hidden" value="frs">
+							<input type="hidden" id="security_code_hidden" value="ba263">
+							<center>
+								<!--								
+								<button type="button" class="btn" onclick="ajuda()">Ajuda</button>
+								&nbsp;-->
+								<input type="button" class="btn btn-default" value="Limpar" onclick="limpa()">
+								&nbsp;
+								<input type="submit" class="btn btn-primary" id="btnConsultar" value="Consultar">
+								&nbsp;&nbsp;
+								<i class="fa fa-question-circle fa-2x" style="cursor:pointer" title="Ajuda" onclick="ajuda()"></i>
+							</center>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-8">
+				<div id="tbr" class="table-responsive"><table width="100%" bgcolor="#999999" class="table table-bordered table-striped h6">
+				<tbody><tr style="display:none">
+					<td colspan="2">Total de normas encontradas:&nbsp;<span id="spanTotalReg" style="font-weight:bold">133</span></td>
+				</tr>
+			
+				<tr>
+					<th style="text-align:left;color:#FFFFFF;background-color:#999999">QTD</th>
+					<th style="text-align:left;color:#FFFFFF;background-color:#999999">Normas</th>
+				</tr>
+					<tr style="background:">
+			<td align="center" style="vertical-align:middle">1</td>
+			<td>
+				<a href="norma.php?chave=0000044791" target="_blank" style="font-weight:bold">
+					Lei 13994   de 02/01/2020				</a>
+								<br>
+				Dispõe sobre concessão de Título Honorífico.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">2</td>
+			<td>
+				<a href="norma.php?chave=0000044792" target="_blank" style="font-weight:bold">
+					Lei 13995   de 02/01/2020				</a>
+								<br>
+				Dispõe sobre concessão de Título Honorífico.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">3</td>
+			<td>
+				<a href="norma.php?chave=0000044793" target="_blank" style="font-weight:bold">
+					Lei 13996   de 02/01/2020				</a>
+								<br>
+				Dispõe sobre concessão de Título Honorífico.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">4</td>
+			<td>
+				<a href="norma.php?chave=0000044794" target="_blank" style="font-weight:bold">
+					Lei 13997   de 02/01/2020				</a>
+								<br>
+				Dispõe sobre concessão de Título Honorífico.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">5</td>
+			<td>
+				<a href="norma.php?chave=0000044796" target="_blank" style="font-weight:bold">
+					Lei 13998   de 03/01/2020				</a>
+								<br>
+				Institui o Maio Laranja, a ser realizado a cada ano, em todo o Município de Juiz de Fora, no mês de maio, quando serão efetivadas ações relacionadas ao combate ao abuso e à exploração sexual de crianças e adolescentes.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">6</td>
+			<td>
+				<a href="norma.php?chave=0000044797" target="_blank" style="font-weight:bold">
+					Lei 13999   de 03/01/2020				</a>
+								<br>
+				Dispõe sobre denominação de Logradouro Público.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">7</td>
+			<td>
+				<a href="norma.php?chave=0000044813" target="_blank" style="font-weight:bold">
+					Lei 14000   de 07/01/2020				</a>
+								<br>
+				Dispõe sobre Concessão de Título Honorífico.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">8</td>
+			<td>
+				<a href="norma.php?chave=0000044821" target="_blank" style="font-weight:bold">
+					Lei 14001   de 08/01/2020				</a>
+								<br>
+				Institui a “Semana Municipal de Educação no Trânsito” e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">9</td>
+			<td>
+				<a href="norma.php?chave=0000044843" target="_blank" style="font-weight:bold">
+					Lei 14002   de 13/01/2020				</a>
+								<br>
+				Dispõe sobre o direito a um acompanhante em exames realizados através de sedação na rede pública, hospitais privados e clínicas que disponibilizam esses serviços no Município de Juiz de Fora e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">10</td>
+			<td>
+				<a href="norma.php?chave=0000044887" target="_blank" style="font-weight:bold">
+					Lei 14003   de 16/01/2020				</a>
+								<br>
+				Dispõe sobre a reserva de vagas de estacionamento de shopping centers, centros comerciais e hipermercados para gestantes e lactantes, no âmbito do Município de Juiz de Fora e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">11</td>
+			<td>
+				<a href="norma.php?chave=0000044927" target="_blank" style="font-weight:bold">
+					Lei 14004   de 28/01/2020				</a>
+								<br>
+				Dispõe sobre concessão de Título Honorífico.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">12</td>
+			<td>
+				<a href="norma.php?chave=0000044928" target="_blank" style="font-weight:bold">
+					Lei 14005   de 28/01/2020				</a>
+								<br>
+				Dispõe sobre Concessão de Título Benemérito.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">13</td>
+			<td>
+				<a href="norma.php?chave=0000044947" target="_blank" style="font-weight:bold">
+					Lei 14006   de 30/01/2020				</a>
+								<br>
+				Dispõe sobre a autorização para que o Município de Juiz de Fora conceda direito real resolúvel de uso de bem imóvel sobre o qual está edificado o Aeroporto Municipal Francisco Álvares de Assis e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">14</td>
+			<td>
+				<a href="norma.php?chave=0000044962" target="_blank" style="font-weight:bold">
+					Lei 14007   de 03/02/2020				</a>
+								<br>
+				Institui no Calendário Oficial do Município de Juiz de Fora o “Dia do Servidor Público Aposentado”, a ser comemorado, anualmente, no dia 17 de junho, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">15</td>
+			<td>
+				<a href="norma.php?chave=0000044971" target="_blank" style="font-weight:bold">
+					Lei 14008   de 04/02/2020				</a>
+								<br>
+				Institui a Semana Municipal de Prevenção, Conscientização e Combate à Automutilação.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">16</td>
+			<td>
+				<a href="norma.php?chave=0000044972" target="_blank" style="font-weight:bold">
+					Lei 14009   de 04/02/2020				</a>
+								<br>
+				Dispõe sobre denominação de Logradouro Público.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">17</td>
+			<td>
+				<a href="norma.php?chave=0000044973" target="_blank" style="font-weight:bold">
+					Lei 14010   de 04/02/2020				</a>
+								<br>
+				Declara de Utilidade Pública Municipal a entidade que menciona.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">18</td>
+			<td>
+				<a href="norma.php?chave=0000044990" target="_blank" style="font-weight:bold">
+					Lei 14011   de 07/02/2020				</a>
+								<br>
+				Dispõe sobre a Concessão de Direito Real de Uso dos imóveis que menciona.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">19</td>
+			<td>
+				<a href="norma.php?chave=0000044995" target="_blank" style="font-weight:bold">
+					Lei 14012   de 10/02/2020				</a>
+								<br>
+				Institui o “Dia Municipal da Limpeza Urbana” e a “Semana Municipal da Limpeza Urbana”, no âmbito do Município de Juiz de Fora e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">20</td>
+			<td>
+				<a href="norma.php?chave=0000044996" target="_blank" style="font-weight:bold">
+					Lei 14013   de 10/02/2020				</a>
+								<br>
+				Institui o “Dia Municipal do Deficiente Visual” no âmbito do Município de Juiz de Fora e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">21</td>
+			<td>
+				<a href="norma.php?chave=0000044997" target="_blank" style="font-weight:bold">
+					Lei 14014   de 10/02/2020				</a>
+								<br>
+				Dispõe sobre afixação de cartazes nos estacionamentos privados, alertando sobre o abandono involuntário de menores no interior dos veículos.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">22</td>
+			<td>
+				<a href="norma.php?chave=0000045066" target="_blank" style="font-weight:bold">
+					Lei 14015   de 13/02/2020				</a>
+								<br>
+				Dispõe sobre o Programa de Certificação Sustentável em Edificações no Município de Juiz de Fora, denominado JF IPTU VERDE e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">23</td>
+			<td>
+				<a href="norma.php?chave=0000045088" target="_blank" style="font-weight:bold">
+					Lei 14016   de 19/02/2020				</a>
+								<br>
+				Institui o Programa de Participação de Mutirões Organizados para preservação e manutenção de logradouros públicos.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">24</td>
+			<td>
+				<a href="norma.php?chave=0000045050" target="_blank" style="font-weight:bold">
+					Lei 14017   de 20/02/2020				</a>
+								<br>
+				Dispõe sobre concessão de Título de Cidadania Honorária.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">25</td>
+			<td>
+				<a href="norma.php?chave=0000045111" target="_blank" style="font-weight:bold">
+					Lei 14018   de 06/03/2020				</a>
+								<br>
+				Dispõe sobre concessão de Título de Cidadão Benemérito.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">26</td>
+			<td>
+				<a href="norma.php?chave=0000045119" target="_blank" style="font-weight:bold">
+					Lei 14020   de 10/03/2020				</a>
+								<br>
+				Dispõe sobre denominação de Logradouro Público.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">27</td>
+			<td>
+				<a href="norma.php?chave=0000045123" target="_blank" style="font-weight:bold">
+					Lei 14019   de 10/03/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprio municipal.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">28</td>
+			<td>
+				<a href="norma.php?chave=0000045148" target="_blank" style="font-weight:bold">
+					Lei 14021   de 17/03/2020				</a>
+								<br>
+				Dispõe sobre a recomposição de vencimentos e remunerações dos servidores efetivos e em comissão da Câmara Municipal de Juiz de Fora, os valores das gratificações legislativas e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">29</td>
+			<td>
+				<a href="norma.php?chave=0000045166" target="_blank" style="font-weight:bold">
+					Lei 14022   de 19/03/2020				</a>
+								<br>
+				Dispõe sobre denominação de Logradouros Públicos.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">30</td>
+			<td>
+				<a href="norma.php?chave=0000045207" target="_blank" style="font-weight:bold">
+					Lei 14023   de 27/03/2020				</a>
+								<br>
+				Autoriza a abertura de Crédito Especial no valor de R$30.000.000,00 e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">31</td>
+			<td>
+				<a href="norma.php?chave=0000045253" target="_blank" style="font-weight:bold">
+					Lei 14024   de 08/04/2020				</a>
+								<br>
+				Acrescenta o dispositivo que menciona.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">32</td>
+			<td>
+				<a href="norma.php?chave=0000045269" target="_blank" style="font-weight:bold">
+					Lei 14025   de 15/04/2020				</a>
+								<br>
+				Dispõe sobre vaga em creche para criança, filho ou filha de pais com relação de trabalho, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">33</td>
+			<td>
+				<a href="norma.php?chave=0000045270" target="_blank" style="font-weight:bold">
+					Lei 14026   de 15/04/2020				</a>
+								<br>
+				Dispõe sobre os hipermercados e supermercados disponibilizarem funcionários para auxiliar deficientes visuais nas suas compras.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">34</td>
+			<td>
+				<a href="norma.php?chave=0000045267" target="_blank" style="font-weight:bold">
+					Lei 14027   de 15/04/2020				</a>
+								<br>
+				Dispõe sobre a criação de espaço reservado para pessoas que utilizam cadeira de rodas nos estabelecimentos que especifica e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">35</td>
+			<td>
+				<a href="norma.php?chave=0000045305" target="_blank" style="font-weight:bold">
+					Lei 14028   de 28/04/2020				</a>
+								<br>
+				Institui o "IPTU Acessibilidade", desconto no Imposto Predial Territorial Urbano (IPTU) aos proprietários de imóveis residenciais e comerciais que adaptem as calçadas ao portador de necessidades especiais e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">36</td>
+			<td>
+				<a href="norma.php?chave=0000045277" target="_blank" style="font-weight:bold">
+					Lei 14029   de 29/04/2020				</a>
+								<br>
+				Dispõe sobre concessão de Título de Cidadania Honorária.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">37</td>
+			<td>
+				<a href="norma.php?chave=0000045283" target="_blank" style="font-weight:bold">
+					Lei 14030   de 30/04/2020				</a>
+								<br>
+				Dispõe sobre a alteração do prazo para pagamento dos tributos que menciona e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">38</td>
+			<td>
+				<a href="norma.php?chave=0000045288" target="_blank" style="font-weight:bold">
+					Lei 14031   de 05/05/2020				</a>
+								<br>
+				Declara de Utilidade Pública Municipal a entidade que menciona.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">39</td>
+			<td>
+				<a href="norma.php?chave=0000045303" target="_blank" style="font-weight:bold">
+					Lei 14032   de 08/05/2020				</a>
+								<br>
+				Determina a fixação de placa nos Tabelionatos de Notas e nos Ofícios de Registro de Imóveis, visando a dar ciência ao público do direito de pleitear, em determinadas hipóteses, a isenção parcial do valor dos emolumentos.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">40</td>
+			<td>
+				<a href="norma.php?chave=0000045304" target="_blank" style="font-weight:bold">
+					Lei 14033   de 08/05/2020				</a>
+								<br>
+				Dispõe sobre a disponibilização de produtos antissépticos ou similares, como complemento na higienização das mãos, nos estabelecimentos que menciona, no âmbito do Município de Juiz de Fora, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">41</td>
+			<td>
+				<a href="norma.php?chave=0000045327" target="_blank" style="font-weight:bold">
+					Lei 14035   de 15/05/2020				</a>
+								<br>
+				Dispõe sobre o recebimento de doações de bens móveis e de serviços, sem ônus ou encargos, de pessoas físicas ou jurídicas de direito privado pelos órgãos e pelas entidades da Administração Pública direta, autárquica e fundacional.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">42</td>
+			<td>
+				<a href="norma.php?chave=0000045328" target="_blank" style="font-weight:bold">
+					Lei 14036   de 15/05/2020				</a>
+								<br>
+				Obriga as empresas concessionárias do serviço de Transporte Coletivo do Município de Juiz de Fora a instalar dispensadores de álcool em gel, abastecidos, no interior dos veículos desse serviço.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">43</td>
+			<td>
+				<a href="norma.php?chave=0000045329" target="_blank" style="font-weight:bold">
+					Lei 14037   de 15/05/2020				</a>
+								<br>
+				Dispõe sobre denominação de Logradouro Público.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">44</td>
+			<td>
+				<a href="norma.php?chave=0000045368" target="_blank" style="font-weight:bold">
+					Lei 14034   de 15/05/2020				</a>
+								<br>
+				Altera a Lei nº 8.393, de 30 de dezembro de 1993, que “Dispõe sobre a concessão de complementação salarial aos servidores públicos vinculados ao Sistema Único de Saúde (SUS) e dá outras providências”.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">45</td>
+			<td>
+				<a href="norma.php?chave=0000045357" target="_blank" style="font-weight:bold">
+					Lei 14038   de 22/05/2020				</a>
+								<br>
+				Declara de Utilidade Pública Municipal a entidade que menciona.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">46</td>
+			<td>
+				<a href="norma.php?chave=0000045363" target="_blank" style="font-weight:bold">
+					Lei 14039   de 26/05/2020				</a>
+								<br>
+				Institui o Dia Municipal do Saxofonista.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">47</td>
+			<td>
+				<a href="norma.php?chave=0000045364" target="_blank" style="font-weight:bold">
+					Lei 14040   de 26/05/2020				</a>
+								<br>
+				Dispõe sobre a afixação de cartaz ou suporte similar nos estabelecimentos revendedores varejistas de combustíveis automotivos no Município de Juiz de Fora, a respeito da divulgação que menciona, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">48</td>
+			<td>
+				<a href="norma.php?chave=0000045423" target="_blank" style="font-weight:bold">
+					Lei 14041   de 01/06/2020				</a>
+								<br>
+				Dispõe sobre a transparência nas compras e contratos emergenciais firmados pelo Poder Executivo em razão da situação de calamidade decorrente da pandemia do coronavírus - covid -19.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">49</td>
+			<td>
+				<a href="norma.php?chave=0000045424" target="_blank" style="font-weight:bold">
+					Lei 14042   de 01/06/2020				</a>
+								<br>
+				Torna obrigatória a publicação, pelo Executivo Municipal, de um boletim diário para prestação de contas relacionada ao fato gerador de decretação de estado de emergência ou calamidade pública e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">50</td>
+			<td>
+				<a href="norma.php?chave=0000045425" target="_blank" style="font-weight:bold">
+					Lei 14043   de 02/06/2020				</a>
+								<br>
+				Dispõe sobre a redução proporcional das mensalidades dos estabelecimentos de ensino da rede privada do Município de Juiz de Fora durante o período de suspensão das aulas, em razão do plano municipal de contingência do Novo Coronavírus.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">51</td>
+			<td>
+				<a href="norma.php?chave=0000045426" target="_blank" style="font-weight:bold">
+					Lei 14044   de 02/06/2020				</a>
+								<br>
+				Acrescenta os seguintes parágrafos ao art. 1º e revoga dispositivos da Lei nº 11.499, de 18 de dezembro de 2007, que concede isenção do Imposto Sobre Serviços de Qualquer Natureza (ISSQN) aos contribuintes autônomos com idade igual ou superior a sessenta e cinco anos.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">52</td>
+			<td>
+				<a href="norma.php?chave=0000045427" target="_blank" style="font-weight:bold">
+					Lei 14045   de 02/06/2020				</a>
+								<br>
+				Dispõe sobre denominação de Logradouro Público.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">53</td>
+			<td>
+				<a href="norma.php?chave=0000045428" target="_blank" style="font-weight:bold">
+					Lei 14046   de 05/06/2020				</a>
+								<br>
+				Dispõe sobre a denominação de Logradouros Públicos.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">54</td>
+			<td>
+				<a href="norma.php?chave=0000045422" target="_blank" style="font-weight:bold">
+					Lei 14047   de 19/06/2020				</a>
+								<br>
+				Dispõe sobre concessão de Título de Cidadão Honorário de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">55</td>
+			<td>
+				<a href="norma.php?chave=0000045447" target="_blank" style="font-weight:bold">
+					Lei 14048   de 25/06/2020				</a>
+								<br>
+				Institui a Semana Municipal de Luta Contra o Bullying.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">56</td>
+			<td>
+				<a href="norma.php?chave=0000045448" target="_blank" style="font-weight:bold">
+					Lei 14049   de 25/06/2020				</a>
+								<br>
+				Inclui no Calendário Oficial do Município de Juiz de Fora o Dia Municipal de Defesa das Prerrogativas da Advocacia Juiz-Forana.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">57</td>
+			<td>
+				<a href="norma.php?chave=0000045463" target="_blank" style="font-weight:bold">
+					Lei 14050   de 29/06/2020				</a>
+								<br>
+				Dispõe sobre a obrigatoriedade de as agências bancárias instaladas no Município de Juiz de Fora disponibilizarem funcionário para atendimento aos idosos e às pessoas com deficiência (PcD) junto aos terminais de autoatendimento.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">58</td>
+			<td>
+				<a href="norma.php?chave=0000045465" target="_blank" style="font-weight:bold">
+					Lei 14051   de 30/06/2020				</a>
+								<br>
+				Institui o Programa de Sustentabilidade Ambiental na rede municipal de ensino e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">59</td>
+			<td>
+				<a href="norma.php?chave=0000045466" target="_blank" style="font-weight:bold">
+					Lei 14052   de 30/06/2020				</a>
+								<br>
+				Institui o Programa “Tempo de Despertar”, que dispõe sobre a reflexão, conscientização e responsabilização dos autores de violência doméstica e grupos reflexivos de homens, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">60</td>
+			<td>
+				<a href="norma.php?chave=0000045467" target="_blank" style="font-weight:bold">
+					Lei 14053   de 30/06/2020				</a>
+								<br>
+				Institui o Fundo Municipal de Proteção ao Patrimônio Cultural (FUMPAC) no Município de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">61</td>
+			<td>
+				<a href="norma.php?chave=0000045468" target="_blank" style="font-weight:bold">
+					Lei 14054   de 30/06/2020				</a>
+								<br>
+				Institui a “Campanha Educativa Permanente de Prevenção e Combate ao Mosquito Transmissor das Doenças Dengue, Zika, Chikungunya e Febre Amarela” nas escolas de educação infantil e de ensino fundamental das redes pública e privada de ensino localizadas no Município de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">62</td>
+			<td>
+				<a href="norma.php?chave=0000045469" target="_blank" style="font-weight:bold">
+					Lei 14055   de 30/06/2020				</a>
+								<br>
+				Dispõe sobre a obrigatoriedade de os supermercados, hipermercados, padarias, farmácias e demais estabelecimentos que exigem ao consumidor que se encaminhe ao Caixa para pagamento adotarem medidas profiláticas contra a Covid-19.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">63</td>
+			<td>
+				<a href="norma.php?chave=0000045470" target="_blank" style="font-weight:bold">
+					Lei 14056   de 30/06/2020				</a>
+								<br>
+				Dispõe sobre a obrigatoriedade de medição da temperatura corporal dos consumidores, para ingresso destes nos estabelecimentos privados de que menciona esta Lei, como forma de evitar a disseminação da pandemia do Coronavírus (Covid-19) no âmbito do Município de Juiz de Fora e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">64</td>
+			<td>
+				<a href="norma.php?chave=0000045482" target="_blank" style="font-weight:bold">
+					Lei 14057   de 02/07/2020				</a>
+								<br>
+				Institui a Política Municipal de Prevenção ao Suicídio.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">65</td>
+			<td>
+				<a href="norma.php?chave=0000045483" target="_blank" style="font-weight:bold">
+					Lei 14058   de 02/07/2020				</a>
+								<br>
+				Dispõe sobre a obrigatoriedade de instalação de dispensadores de álcool em gel no interior das agências bancárias e financeiras do Município de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">66</td>
+			<td>
+				<a href="norma.php?chave=0000045484" target="_blank" style="font-weight:bold">
+					Lei 14059   de 02/07/2020				</a>
+								<br>
+				Dispõe sobre a implantação de ações preventivas à depressão em adolescentes nas escolas.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">67</td>
+			<td>
+				<a href="norma.php?chave=0000045541" target="_blank" style="font-weight:bold">
+					Lei 14060   de 13/07/2020				</a>
+								<br>
+				Dispõe sobre denominação de Logradouro Público.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">68</td>
+			<td>
+				<a href="norma.php?chave=0000045556" target="_blank" style="font-weight:bold">
+					Lei 14061   de 23/07/2020				</a>
+								<br>
+				Autoriza o Executivo Municipal a destinar os bens imóveis que menciona ao Regime Próprio de Previdência Social - RPPS do Município de Juiz de Fora, e dispõe sobre a alienação desses imóveis à Empresa Municipal de Pavimentação e Urbanização - EMPAV.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">69</td>
+			<td>
+				<a href="norma.php?chave=0000045563" target="_blank" style="font-weight:bold">
+					Lei 14062   de 24/07/2020				</a>
+								<br>
+				Autoriza a retrocessão do imóvel que menciona, revoga o Decreto nº 5.748, de 29 de outubro de 1996, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">70</td>
+			<td>
+				<a href="norma.php?chave=0000045564" target="_blank" style="font-weight:bold">
+					Lei 14063   de 24/07/2020				</a>
+								<br>
+				Dispõe sobre a caracterização de celebrações religiosas como atividades essenciais em estado de emergência e/ou estado de calamidade pública.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">71</td>
+			<td>
+				<a href="norma.php?chave=0000045575" target="_blank" style="font-weight:bold">
+					Lei 14064   de 28/07/2020				</a>
+								<br>
+				Dispõe sobre a concessão de Título de Cidadão Benemérito.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">72</td>
+			<td>
+				<a href="norma.php?chave=0000045576" target="_blank" style="font-weight:bold">
+					Lei 14065   de 28/07/2020				</a>
+								<br>
+				Dispõe sobre acréscimo à Lei nº 7.956, de 1º de outubro de 1991, que denominou a Rua Professor Thompson Palhares.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">73</td>
+			<td>
+				<a href="norma.php?chave=0000045577" target="_blank" style="font-weight:bold">
+					Lei 14066   de 28/07/2020				</a>
+								<br>
+				Dispõe sobre a denominação de próprio municipal.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">74</td>
+			<td>
+				<a href="norma.php?chave=0000045637" target="_blank" style="font-weight:bold">
+					Lei 14067   de 28/07/2020				</a>
+								<br>
+				Obriga a Cemig a atender a solicitação de ligação nova de energia mediante simples comprovação de posse do imóvel, a pedido do possuidor, no Município de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">75</td>
+			<td>
+				<a href="norma.php?chave=0000045602" target="_blank" style="font-weight:bold">
+					Lei 14068   de 03/08/2020				</a>
+								<br>
+				Dispõe sobre a concessão de Título Honorífico.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">76</td>
+			<td>
+				<a href="norma.php?chave=0000045619" target="_blank" style="font-weight:bold">
+					Lei 14069   de 06/08/2020				</a>
+								<br>
+				Dispõe sobre denominação de logradouro público.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">77</td>
+			<td>
+				<a href="norma.php?chave=0000045620" target="_blank" style="font-weight:bold">
+					Lei 14070   de 06/08/2020				</a>
+								<br>
+				Torna obrigatória a disponibilização de sanitários nos estabelecimentos bancários aos seus clientes e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">78</td>
+			<td>
+				<a href="norma.php?chave=0000045628" target="_blank" style="font-weight:bold">
+					Lei 14071   de 07/08/2020				</a>
+								<br>
+				Dispõe sobre a concessão de Título de Cidadão Benemérito.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">79</td>
+			<td>
+				<a href="norma.php?chave=0000045629" target="_blank" style="font-weight:bold">
+					Lei 14072   de 07/08/2020				</a>
+								<br>
+				Dispõe sobre a concessão de Título Honorífico.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">80</td>
+			<td>
+				<a href="norma.php?chave=0000045633" target="_blank" style="font-weight:bold">
+					Lei 14073   de 10/08/2020				</a>
+								<br>
+				Institui a Semana Outubro Rosa nas Unidades Básicas de Saúde de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">81</td>
+			<td>
+				<a href="norma.php?chave=0000045634" target="_blank" style="font-weight:bold">
+					Lei 14074   de 10/08/2020				</a>
+								<br>
+				Institui a “Semana Municipal Projeto Sobre Viver - Acolhimento de Mulheres”.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">82</td>
+			<td>
+				<a href="norma.php?chave=0000045635" target="_blank" style="font-weight:bold">
+					Lei 14075   de 10/08/2020				</a>
+								<br>
+				Dispõe sobre a concessão de Título Honorífico.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">83</td>
+			<td>
+				<a href="norma.php?chave=0000045636" target="_blank" style="font-weight:bold">
+					Lei 14076   de 10/08/2020				</a>
+								<br>
+				Revoga a Lei nº 13.880, de 7 de junho de 2019, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">84</td>
+			<td>
+				<a href="norma.php?chave=0000045639" target="_blank" style="font-weight:bold">
+					Lei 14077   de 11/08/2020				</a>
+								<br>
+				Institui o “Dia Municipal de Conscientização e Prevenção ao Suicídio” e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">85</td>
+			<td>
+				<a href="norma.php?chave=0000045660" target="_blank" style="font-weight:bold">
+					Lei 14078   de 13/08/2020				</a>
+								<br>
+				Dispõe sobre denominação de logradouro público.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">86</td>
+			<td>
+				<a href="norma.php?chave=0000045661" target="_blank" style="font-weight:bold">
+					Lei 14079   de 13/08/2020				</a>
+								<br>
+				Dispõe sobre a denominação do Centro de Referência Casa da Mulher.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">87</td>
+			<td>
+				<a href="norma.php?chave=0000045662" target="_blank" style="font-weight:bold">
+					Lei 14080   de 13/08/2020				</a>
+								<br>
+				Dispõe sobre a divulgação, em estabelecimentos comerciais e em locais onde animais são mantidos, do crime e das penas relativos à prática de ato de abuso e maus-tratos de animais silvestres, domésticos ou domesticados, nativos ou exóticos, no âmbito do Município de Juiz de Fora e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">88</td>
+			<td>
+				<a href="norma.php?chave=0000045663" target="_blank" style="font-weight:bold">
+					Lei 14801   de 13/08/2020				</a>
+								<br>
+				Dispõe sobre denominação de logradouro público.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">89</td>
+			<td>
+				<a href="norma.php?chave=0000045676" target="_blank" style="font-weight:bold">
+					Lei 14082   de 18/08/2020				</a>
+								<br>
+				Institui o “Dia Municipal de Conscientização da Atenção Primária à Saúde” e a “Semana Municipal de Conscientização da Atenção Primária à Saúde”, no âmbito do Município de Juiz de Fora, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">90</td>
+			<td>
+				<a href="norma.php?chave=0000045677" target="_blank" style="font-weight:bold">
+					Lei 14083   de 18/08/2020				</a>
+								<br>
+				Dispõe sobre denominação de logradouro público.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">91</td>
+			<td>
+				<a href="norma.php?chave=0000045678" target="_blank" style="font-weight:bold">
+					Lei 14084   de 18/08/2020				</a>
+								<br>
+				Torna obrigatória a publicação, no Portal da Transparência Municipal, de dados relativos à evolução patrimonial de agentes públicos.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">92</td>
+			<td>
+				<a href="norma.php?chave=0000045701" target="_blank" style="font-weight:bold">
+					Lei 14085   de 24/08/2020				</a>
+								<br>
+				Dispõe sobre a suspensão dos prazos de validade dos concursos públicos municipais durante o estado de calamidade pública no Município de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">93</td>
+			<td>
+				<a href="norma.php?chave=0000045780" target="_blank" style="font-weight:bold">
+					Lei 14086   de 16/09/2020				</a>
+								<br>
+				Estabelece o direito de as mães amamentarem seus filhos durante a realização de concursos públicos promovidos pelo Município de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">94</td>
+			<td>
+				<a href="norma.php?chave=0000045783" target="_blank" style="font-weight:bold">
+					Lei 14087   de 16/09/2020				</a>
+								<br>
+				Dispõe sobre alterações e revogações nas Leis nos 4.755, de 17 de dezembro de 1974, 5.471, de 14 de setembro de 1978, 5.517, de 28 de novembro de 1978, 9.212, de 27 de janeiro de 1998, 10.589, de 21 de dezembro de 2003, 10.988, de 19 de setembro de 2005, 11.935, de 30 de dezembro de 2009 e 13.830, de 31 de janeiro de 2019, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">95</td>
+			<td>
+				<a href="norma.php?chave=0000045797" target="_blank" style="font-weight:bold">
+					Lei 14088   de 18/09/2020				</a>
+								<br>
+				Dispõe sobre a desafetação e a alienação da área que menciona, autoriza a destinação de parte do produto da alienação ao Regime Próprio de Previdência Social - RPPS do Município de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">96</td>
+			<td>
+				<a href="norma.php?chave=0000045798" target="_blank" style="font-weight:bold">
+					Lei 14089   de 18/09/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprio municipal.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">97</td>
+			<td>
+				<a href="norma.php?chave=0000045799" target="_blank" style="font-weight:bold">
+					Lei 14090   de 18/09/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprio municipal.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">98</td>
+			<td>
+				<a href="norma.php?chave=0000045817" target="_blank" style="font-weight:bold">
+					Lei 14091   de 23/09/2020				</a>
+								<br>
+				Dispõe sobre denominação da escola municipal de educação infantil a ser construída no Bairro Marilândia.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">99</td>
+			<td>
+				<a href="norma.php?chave=0000045822" target="_blank" style="font-weight:bold">
+					Lei 14098   de 24/09/2020				</a>
+								<br>
+				Dispõe sobre a determinação de tempo máximo para atendimento ao público nas Agências de Atendimento Presencial das Empresas Concessionárias de Telefonia Móvel e Fixa no Município de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">100</td>
+			<td>
+				<a href="norma.php?chave=0000045847" target="_blank" style="font-weight:bold">
+					Lei 14092   de 24/09/2020				</a>
+								<br>
+				Torna obrigatório assento acessível para pessoa com obesidade nos casos que menciona.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">101</td>
+			<td>
+				<a href="norma.php?chave=0000045848" target="_blank" style="font-weight:bold">
+					Lei 14093   de 24/09/2020				</a>
+								<br>
+				Dispõe sobre a obrigatoriedade do envio de um funcionário bancário para a realização da prova de vida dos idosos maiores de 70 anos no Município de Juiz de Fora e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">102</td>
+			<td>
+				<a href="norma.php?chave=0000045849" target="_blank" style="font-weight:bold">
+					Lei 14094   de 24/09/2020				</a>
+								<br>
+				Institui a proibição de venda de seringas e agulhas descartáveis a menores de 18 anos de idade no Município de Juiz de Fora, especialmente nas farmácias e drogarias, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">103</td>
+			<td>
+				<a href="norma.php?chave=0000045850" target="_blank" style="font-weight:bold">
+					Lei 14095   de 24/09/2020				</a>
+								<br>
+				Dispõe sobre a caracterização das atividades privadas de advocacia, contabilidade e imobiliária como essenciais durante a vigência de estado de emergência e/ou estado de calamidade pública.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">104</td>
+			<td>
+				<a href="norma.php?chave=0000045851" target="_blank" style="font-weight:bold">
+					Lei 14096   de 24/09/2020				</a>
+								<br>
+				Proíbe o corte de serviços essenciais por falta de pagamento nos dias que especifica e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">105</td>
+			<td>
+				<a href="norma.php?chave=0000045852" target="_blank" style="font-weight:bold">
+					Lei 14097   de 24/09/2020				</a>
+								<br>
+				Determina o recebimento remoto de receitas médicas pelas farmácias e drogarias no Município de Juiz de Fora, em caráter emergencial, enquanto perdurar a epidemia de covid-19, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">106</td>
+			<td>
+				<a href="norma.php?chave=0000045882" target="_blank" style="font-weight:bold">
+					Lei 14099   de 28/09/2020				</a>
+								<br>
+				Dispõe sobre os serviços de day care e hospedagem de animais domésticos no Município de Juiz de Fora e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">107</td>
+			<td>
+				<a href="norma.php?chave=0000045883" target="_blank" style="font-weight:bold">
+					Lei 14100   de 28/09/2020				</a>
+								<br>
+				Declara como essenciais as atividades prestadas pelos profissionais cabeleireiro, barbeiro, esteticista, manicure, pedicure, depilador, maquiador e similares e dá outras providências.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">108</td>
+			<td>
+				<a href="norma.php?chave=0000045859" target="_blank" style="font-weight:bold">
+					Lei 14101   de 30/09/2020				</a>
+								<br>
+				Altera a Lei nº 10.364, de 23 de dezembro de 2002, que “Institui a Contribuição para Custeio do Serviço de Iluminação Pública - CCSIP, e dá outras providências”.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">109</td>
+			<td>
+				<a href="norma.php?chave=0000045920" target="_blank" style="font-weight:bold">
+					Lei 14102   de 16/10/2020				</a>
+								<br>
+				Declara de Utilidade Pública Municipal a entidade que menciona.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">110</td>
+			<td>
+				<a href="norma.php?chave=0000045933" target="_blank" style="font-weight:bold">
+					Lei 14103   de 20/10/2020				</a>
+								<br>
+				Dispõe sobre as diretrizes para a elaboração e execução da Lei Orçamentária para o exercício financeiro de 2021 e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">111</td>
+			<td>
+				<a href="norma.php?chave=0000045943" target="_blank" style="font-weight:bold">
+					Lei 14104   de 22/10/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprio municipal.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">112</td>
+			<td>
+				<a href="norma.php?chave=0000045944" target="_blank" style="font-weight:bold">
+					Lei 14105   de 22/10/2020				</a>
+								<br>
+				Dispõe sobre denominação de logradouro público.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">113</td>
+			<td>
+				<a href="norma.php?chave=0000045945" target="_blank" style="font-weight:bold">
+					Lei 14106   de 22/10/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprios municipais.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">114</td>
+			<td>
+				<a href="norma.php?chave=0000046023" target="_blank" style="font-weight:bold">
+					Lei 14107   de 27/10/2020				</a>
+								<br>
+				Declara como essenciais os serviços prestados por academias de ginástica e similares, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">115</td>
+			<td>
+				<a href="norma.php?chave=0000046024" target="_blank" style="font-weight:bold">
+					Lei 14108   de 29/10/2020				</a>
+								<br>
+				Dispõe sobre o Monitor de Travessia Voluntário no Município de Juiz de Fora.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">116</td>
+			<td>
+				<a href="norma.php?chave=0000046051" target="_blank" style="font-weight:bold">
+					Lei 14109   de 05/11/2020				</a>
+								<br>
+				Dispõe sobre a isenção de cobrança de estacionamento em locais acessíveis de uso comum público, tais como hospitais, clínicas médicas e terapêuticas, farmácias, supermercados, shoppings, casas de shows e teatros, à pessoa idosa com mais de 65 anos.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">117</td>
+			<td>
+				<a href="norma.php?chave=0000046052" target="_blank" style="font-weight:bold">
+					Lei 14110   de 05/11/2020				</a>
+								<br>
+				Dispõe sobre a publicidade das reuniões do Comitê de Prevenção e Enfrentamento ao coronavírus (covid-19).			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">118</td>
+			<td>
+				<a href="norma.php?chave=0000046053" target="_blank" style="font-weight:bold">
+					Lei 14111   de 05/11/2020				</a>
+								<br>
+				Dispõe sobre o reconhecimento dos Centros de Atenção Psicossociais – Modalidade III (CAPS III) como serviços com ações similares aos trabalhos dos serviços médico-hospitalares de urgência e emergência no Município de Juiz de Fora, e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">119</td>
+			<td>
+				<a href="norma.php?chave=0000046074" target="_blank" style="font-weight:bold">
+					Lei 14112   de 19/11/2020				</a>
+								<br>
+				Dispõe sobre denominação de Unidade Básica de Saúde.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">120</td>
+			<td>
+				<a href="norma.php?chave=0000046075" target="_blank" style="font-weight:bold">
+					Lei 14113   de 19/11/2020				</a>
+								<br>
+				Dispõe sobre denominação de Unidade Básica de Saúde.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">121</td>
+			<td>
+				<a href="norma.php?chave=0000046076" target="_blank" style="font-weight:bold">
+					Lei 14114   de 19/11/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprios municipais.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">122</td>
+			<td>
+				<a href="norma.php?chave=0000046077" target="_blank" style="font-weight:bold">
+					Lei 14115   de 19/11/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprios municipais e dá outras providências.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">123</td>
+			<td>
+				<a href="norma.php?chave=0000046087" target="_blank" style="font-weight:bold">
+					Lei 14116   de 20/11/2020				</a>
+								<br>
+				Dispõe sobre denominações de Unidades Básicas de Saúde.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">124</td>
+			<td>
+				<a href="norma.php?chave=0000046088" target="_blank" style="font-weight:bold">
+					Lei 14117   de 20/11/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprio municipal.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">125</td>
+			<td>
+				<a href="norma.php?chave=0000046089" target="_blank" style="font-weight:bold">
+					Lei 14118   de 20/11/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprios municipais.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">126</td>
+			<td>
+				<a href="norma.php?chave=0000046090" target="_blank" style="font-weight:bold">
+					Lei 14119   de 20/11/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprio municipal.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">127</td>
+			<td>
+				<a href="norma.php?chave=0000046100" target="_blank" style="font-weight:bold">
+					Lei 14120   de 24/11/2020				</a>
+								<br>
+				Dispõe sobre denominação de próprios municipais.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">128</td>
+			<td>
+				<a href="norma.php?chave=0000046101" target="_blank" style="font-weight:bold">
+					Lei 14121   de 24/11/2020				</a>
+								<br>
+				Dispõe sobre denominação do Bairro Recanto da Mata.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">129</td>
+			<td>
+				<a href="norma.php?chave=0000046137" target="_blank" style="font-weight:bold">
+					Lei 14122   de 02/12/2020				</a>
+								<br>
+				Dispõe sobre a prorrogação do mandato dos Diretores e Vice-Diretores escolares da Rede Municipal de Ensino.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">130</td>
+			<td>
+				<a href="norma.php?chave=0000046138" target="_blank" style="font-weight:bold">
+					Lei 14123   de 02/12/2020				</a>
+								<br>
+				Altera e acrescenta dispositivos à Lei nº 14.011, de 07 de fevereiro de 2020, que dispõe sobre a Concessão de Direito Real de Uso dos Imóveis que menciona.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">131</td>
+			<td>
+				<a href="norma.php?chave=0000046191" target="_blank" style="font-weight:bold">
+					Lei 14126   de 14/12/2020				</a>
+								<br>
+				Dispõe sobre denominação de logradouro público.			</td>
+		</tr>
+				<tr style="background:#E8E8E8">
+			<td align="center" style="vertical-align:middle">132</td>
+			<td>
+				<a href="norma.php?chave=0000046192" target="_blank" style="font-weight:bold">
+					Lei 14127   de 14/12/2020				</a>
+								<br>
+				Dispõe sobre denominação de logradouro público.			</td>
+		</tr>
+				<tr style="background:">
+			<td align="center" style="vertical-align:middle">133</td>
+			<td>
+				<a href="norma.php?chave=0000046193" target="_blank" style="font-weight:bold">
+					Lei 14128   de 14/12/2020				</a>
+								<br>
+				Dispõe sobre denominação de logradouro público.			</td>
+		</tr>
+		<input type="hidden" id="totalReg" value="133"></tbody></table></div>
+			</div>
+		</div>
+				<br><br>
+		<div class="alert alert-info no-print" style="text-align:left">
+			→ Para consultar, informe ao menos os campos obrigatórios (em vermelho) e o código de segurança.
+		</div></div>
+
+<footer class="container-fluid text-center">
+	<div class="no-print">
+		<p class="text-muted">Prefeitura de Juiz de Fora. Todos os direitos reservados. Copyright © 2020</p>
+	</div>
+</footer>
+
+<script type="text/javascript" src="view/js/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="view/js/jquery.inputmask.js"></script>
+<script type="text/javascript" src="view/js/jquery.inputmask.date.extensions.js"></script>
+<script type="text/javascript" src="view/js/jAlert.js"></script>
+<script type="text/javascript" src="view/js/jAlert-functions.js"></script>
+
+<script type="text/javascript">
+	function regerarCaptcha(){
+		$("#form_1").attr("action", "indexConsulta.php?rgc=1#tbr");
+		$("#form_1").attr("onSubmit", "");
+		$("#form_1").submit();
+	}
+	
+	function ajuda(){
+		$.jAlert({
+			'title': "Sistema JFLegis - Ajuda",
+			'iframe': 'ajuda.htm',
+			'iframeHeight': '340px',
+			//'theme': 'dark_green',
+			'size': 'md'
+		});
+	}
+	
+	function limpa(){
+		$('#cod_tipo_norma').find('option:eq(0)').prop('selected', true);
+		var op = $("#cmpOp_hidden").val();
+		if(op == "3"){//palavra
+			$("#op").val("3");
+			$("#cmpDataInicial").val("");
+			$("#cmpDataFinal").val("");
+			$("#cmpPalavra").val("");
+			$('input:radio[name=tipoConsulta]')[1].checked = true;
+			$('#cmpPalavra').focus();
+		}
+		else if(op == "2"){//periodo
+			$("#op").val("2");
+			$("#cmpDataInicial").val("");
+			$("#cmpDataFinal").val("");
+			$('#cmpDataInicial').focus();
+		}
+		else //numero
+		{
+			$("#op").val("1");
+			$("#cmpNumero").val("");
+			$("#cmpNumeroComp").val("");
+			$('#cmpNumero').focus();
+		}
+		//$('#security_code').prop('readonly',false);
+		//$('#security_code').css('color','');
+		//$('#security_code').css('background-color','#fff');
+		//$('#security_code').css('cursor','text');
+		$("#security_code").val("");
+		document.getElementById("tbr").innerHTML = '';
+	}
+	
+	function erroConsulta(){
+		document.getElementById("tbr").innerHTML = "<div class='alert alert-danger alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Ops!</strong> Erro ao realizar a consulta. Por favor, tente novamente mais tarde.</div>";
+	}
+	
+	function resultadoConsulta(retorno){
+		var msg = retorno.substr(0,6);
+		if(msg == 'Nenhum')
+			document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Ops!</strong> Nenhum registro encontrado. Verifique os dados informados e tente novamente.</div>";
+		else if(retorno == "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o!</strong> C&oacute;digo de seguran&ccedil;a n&atilde;o confere. Verifique os caracteres digitados.</div>"){
+			document.getElementById("tbr").innerHTML = retorno;
+			//$('#security_code').prop('readonly',false);
+			//$('#security_code').css('color','');
+			//$('#security_code').css('background-color','#fff');
+			//$('#security_code').css('cursor','text');
+		}
+		else
+		{
+			document.getElementById("tbr").innerHTML = retorno;
+			document.getElementById("spanTotalReg").innerHTML = document.getElementById("totalReg").value;
+		}
+	}
+	
+	function maiusculo(Campo){
+		var vr = String(Campo.value);
+		Campo.value = vr.toUpperCase();
+	}
+	
+	function numeros(e){
+		var tecla=(window.event)?event.keyCode:e.which;
+		if((tecla > 47 && tecla < 58)) return true;//numeros
+		else
+		{
+			if (tecla == 8 || tecla == 0 || tecla == 13) return true;//backspace, delete e enter
+			else return false;
+		}
+	}
+	
+	function dataHoje(formato){
+		var data = new Date();
+		var ano  = data.getFullYear();
+		var mes  = (data.getMonth() + 1);
+		if(mes < '10'){ mes = 0 +''+ mes; }
+		var dia  = data.getDate();
+		if(dia < '10'){ dia = 0 +''+ dia; }
+		var hora = data.getHours();
+		if(formato == '1')
+			return dia +'/'+ mes +'/'+ ano;
+		else
+			return ano +''+ mes +''+ dia;
+	}
+	
+	function mudaDivOpcao(){
+		var op = $("#op option:selected").val();
+		if(op == '1')//numero
+		{
+			$("#opcao_1, #opcao_2").show();
+			$("#opcao_3, #opcao_4, #opcao_5, #opcao_6").hide();
+			$("#cmpNumero").attr("required",true);
+			$("#cmpDataInicial, #cmpDataFinal, #cmpPalavra").attr("required",false);
+			$("#cmpNumero, #cmpNumeroComp").val("");
+			$(".alert-warning").remove();
+			$("#cmpOp_hidden").val(op);
+		}
+		
+		if(op == '2')//periodo
+		{
+			$("#opcao_3, #opcao_4").show();
+			$("#opcao_1, #opcao_2, #opcao_5, #opcao_6").hide();
+			$("#labelDataInicial, #labelDataFinal").css("color","880015");
+			$("#cmpDataInicial, #cmpDataFinal").attr("required",true);
+			$("#cmpNumero, #cmpPalavra").attr("required",false);
+			$("#cmpDataInicial").val("");
+			$(".alert-warning").remove();
+			$("#cmpOp_hidden").val(op);
+		}
+		
+		if(op == '3')//palavra
+		{
+			$("#opcao_3, #opcao_4, #opcao_5, #opcao_6").show();
+			$("#opcao_1, #opcao_2").hide();
+			$("#labelDataInicial, #labelDataFinal").css("color","");
+			$("#cmpPalavra").attr("required",true);
+			$("#cmpNumero, #cmpDataInicial, #cmpDataFinal").attr("required",false);
+			$("#cmpDataInicial, #cmpDataFinal").val("");
+			$(".alert-warning").remove();
+			$("#cmpOp_hidden").val(op);
+		}
+		
+					if(op == '3'){
+				$("[data-mask]").inputmask();
+				$('#cmpDataFinal').val("");
+				$("#cmpPalavra").focus();
+			}
+			else if(op == '2'){
+				$("[data-mask]").inputmask();
+				$('#cmpDataFinal').val( dataHoje('1') );
+				$("#cmpDataInicial").focus();
+			}
+			else $("#cmpNumero").focus();
+				}
+
+	function validaDatas(){
+		if( $("#cmpOp_hidden").val() > "1" && ($("#cmpDataInicial").val().length == "10" || $("#cmpDataFinal").val().length == "10") ){
+		
+			//Verifica se data_final > que data_inicial
+			dia_d1 = $("#cmpDataInicial").val().substring(0,2); 
+			mes_d1 = $("#cmpDataInicial").val().substring(3,5); 
+			ano_d1 = $("#cmpDataInicial").val().substring(6,10); 
+			d1 = ano_d1 +''+ mes_d1 +''+ dia_d1;
+			
+			dia_d2 = $("#cmpDataFinal").val().substring(0,2); 
+			mes_d2 = $("#cmpDataFinal").val().substring(3,5); 
+			ano_d2 = $("#cmpDataFinal").val().substring(6,10);
+			
+			d2 = ano_d2 +''+ mes_d2 +''+ dia_d2;
+			
+			if ( $("#cmpDataInicial").val().length == "10" && $("#cmpDataFinal").val().length == "0" ) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Informe a Data Final.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataFinal").focus();
+				return false;
+			}
+			
+			if ( $("#cmpDataFinal").val().length == "10" && $("#cmpDataInicial").val().length == "0" ) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Informe a Data Inicial.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataInicial").focus();
+				return false;
+			}
+			
+			if (d2 < d1) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Data Final deve ser maior que a Data Inicial.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataFinal").focus();
+				return false;
+			}
+			
+			if (d2 > dataHoje('2')) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Data Final n&atilde;o pode ser maior que a data atual.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataFinal").focus();
+				return false;
+			}
+			
+			// Verifica Ano
+			ano_d1 = $("#cmpDataInicial").val().substring(6,10);
+			ano_d2 = $("#cmpDataFinal").val().substring(6,10);
+			if ( (ano_d2 - ano_d1) != 0 ) {
+				document.getElementById("tbr").innerHTML = "<div class='alert alert-warning alert-dismissible'><a href='#' class='close' data-dismiss='alert' aria-label='close'>&times;</a><strong>Aten&ccedil;&atilde;o</strong>: Datas Inicial e Final devem ser do mesmo ano. Ex.: 01/01/1987 até 31/12/1987.</div>";
+				window.scrollTo(0,document.body.scrollHeight);
+				$("#cmpDataInicial").focus();
+				return false;
+			}
+		}
+		else return true;
+	}
+	
+	// makes sure the whole site is loaded
+	$(window).on('load',function() {
+		//will first fade out the loading animation
+		$("#status").fadeOut();
+		//will fade out the whole DIV that covers the website.
+		$("#preloader").delay(0).fadeOut("fast");
+	});
+	
+	$(document).ready(function(){
+		 mudaDivOpcao();   $('#cmpCodTipoNorma').val("LEI");  $('#cmpDataInicial').val("01/01/2020");  $('#cmpDataFinal').val("14/12/2020"); 
+				//$('#security_code').prop('readonly',true);
+				//$('#security_code').css('color','#999');
+				//$('#security_code').css('background-color','#eee');
+				//$('#security_code').css('cursor','no-drop');
+				$('#security_code').val("ba263");
+				});
+</script>
+
+	<script>
+		document.getElementById("tbr").innerHTML = "<img src='view/img/carregando.gif'>&nbsp;Buscando...";
+		
+		var dados = {
+			cmpOp: $("#cmpOp_hidden").val(),
+			cmpCodTipoNorma: $("#cmpCodTipoNorma_hidden").val(),
+			cmpNumero: $("#cmpNumero_hidden").val(),
+			cmpNumeroComp: $("#cmpNumeroComp_hidden").val(),
+			cmpDataInicial: $("#cmpDataInicial_hidden").val(),
+			cmpDataFinal: $("#cmpDataFinal_hidden").val(),
+			cmpPalavra: $("#cmpPalavra_hidden").val(),
+			cmpTipoConsulta: $("#cmpTipoConsulta_hidden").val(),
+			security_code: $("#security_code_hidden").val()
+		};
+		
+		$.ajax({
+			type: "POST",
+			url: "consulta.php",
+			data: dados,
+			success: function(retorno) {
+				if(retorno == "")
+					erroConsulta();
+				else
+					resultadoConsulta(retorno);
+			},
+			error: function() {
+				erroConsulta();
+			}
+		});
+	</script>
+	
+
+</body></html>
