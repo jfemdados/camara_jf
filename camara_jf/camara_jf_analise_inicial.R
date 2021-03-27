@@ -8,7 +8,7 @@ library(tidyr)
 
 ### PLs de Autoria dos Vereadores ######
 
-pls_juiz_de_fora_2017_2020 <- read_excel("camara_jf/pls juiz de fora2.xlsx", skip= 2)
+pls_juiz_de_fora_2017_2020 <- read_excel("camara_jf/data_raw/pls juiz de fora2.xlsx", skip= 2)
 
 #contando numero de processos inuteis
 pl_inuteis_classe <- c("Cidadão Benemérito ou Honorário", "Criação de Dias Comemorativos", "Nome de Rua", "Nome de Prédios", "imoveis")
@@ -58,7 +58,7 @@ DT::datatable(pls_juiz_de_fora_2017_2020_2, extensions = "Responsive")
 
 ####  PLs Iniciativa Executivo #########
 
-pls_iniciativa_executivo_2017_2020 <- read_excel("camara_jf/pl_iniciativa_executivo_2017_2020.xlsx")
+pls_iniciativa_executivo_2017_2020 <- read_excel("camara_jf/data_raw/pl_iniciativa_executivo_2017_2020.xlsx")
 
 pls_iniciativa_executivo_2017_2020 <- pls_iniciativa_executivo_2017_2020%>%
   select("Projeto", "Ano", "Tipo", "Autor", "Ementa", "Situação")%>%
@@ -86,7 +86,7 @@ pls_iniciativa_executivo_2017_2020 <- pls_iniciativa_executivo_2017_2020%>%
 
 #### PLs Leis Complementares - Câmara ####
 
-pls_lei_complementar <- read_excel("camara_jf/lei_complementar.xlsx")
+pls_lei_complementar <- read_excel("camara_jf/data_raw/lei_complementar.xlsx")
 
 pls_lei_complementar <-  pls_lei_complementar%>%
   select("Projeto", "Ano", "Tipo", "Autor", "Ementa", "Situação")%>%
