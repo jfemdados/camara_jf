@@ -1,4 +1,8 @@
-
+library(tidyverse)
+library(lubridate)
+library(tidyr)
+library(readxl)
+library(tidyr)
 
 ################## TEMAS DA CÂMARA####################################
 
