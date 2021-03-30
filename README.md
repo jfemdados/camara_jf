@@ -8,7 +8,7 @@ Mas o sistema da camara é mais detalhado e é mais simples, não tem um captcha
 Foi o que eu usei pra fazer as analises e está na pasta camara_jf.
 
 
-Por enquanto foi copiando no ctrl c ctrl v do site, mas pretendemos de forma mais automatizada, com uma função. É a nossa meta. Nós vamos deixar a meta aberta (importar as tabelas, e se achar, as mmoções de aplauso) e quando nós atingirmos a meta, a gente dobra a meta (fazer um shiny sobre, buscar outras informações sobre gastos, votação e ordem do dia).
+Por enquanto está só no projeto de lei. é a nossa meta. Nós vamos deixar a meta aberta (importar as tabelas, e se achar, as mmoções de aplauso e requerimentos) e quando nós atingirmos a meta, a gente dobra a meta (fazer um shiny sobre, buscar outras informações sobre gastos, votação e ordem do dia).
 
 Mas está funcionando. Por enquanto, fiquemos com o que temos.
 
@@ -20,4 +20,4 @@ scrapper_cmjf2.R foi eu tentando fazer um web scrapping sobre
 scrapper_cmjf3_funcao_julio.R foi o Julio trecenti fazendo um de moções de aplauso (Cara é brabo)
 filtros_por_assunto.R é a tentativa de classificar o tema de "outros". Por enquanto só tem de covid.
 
-Não estranhem a quantiade de data frames que as vezes eu crio, é exportando pra fazer os gráficos no floruish.studio
+Não estranhem a quantiade de data frames foram criados nos finais dos codigos. Estou exportando esses dados pra fazer os gráficos no floruish.studio.
