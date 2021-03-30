@@ -87,6 +87,17 @@ mocoes_aplauso<- da_camara%>%
 
 readr::write_rds(da_camara, "da_camara.rds")
 
+mocoes_aplauso<- da_camara%>%
+  filter(ano>= 2017)%>%
+  mutate(autor = str_split(autor, ","))%>%
+  unnest(autor)%>%
+  mutate(autor=str_squish(autor))%>%
+  count(autor)
+
+# Export -----------------------------------------------------------------------
+
+readr::write_rds(mocoes_aplauso, "da_mocoes_aplauso.rds")
+rio::export(mocoes_aplauso, "mocoes_aplauso.csv")
 
 library(tidyverse)
 
