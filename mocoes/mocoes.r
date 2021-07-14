@@ -161,13 +161,23 @@ ggplot(aes(x=autor, fill= tema_especifico )) +
 + theme(legend.position = "top") 
 
 
-# Geral Tema --------------------------------------------------------------
 
 
 mocoes %>%
-  ggplot( aes(x=tema_especifico, fill= situacao)) +geom_bar(width = 0.7, color= "black")+
+  ggplot( aes(x=tema_especifico, fill= situacao)) + geom_bar(width = 0.7, color= "black")+
   labs(title= "Relatório 6 Meses da Câmara - Dos PLs apresentados por tema, quais a câmara mais rejeita?",
        subtitle = "Legislatura de 2021 - Autoria Executivo e Legislativo", caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados") +
   theme_minimal() + theme(axis.text.x = element_text(angle = 50, hjust = 1))
 
+
+# Export ------------------------------------------------------------------
+
+#CSV
+rio::export(mocoes_classificado, file= "camara_jf/mocoes/exports/mocoes_classificado.csv")
+rio::export(mocoes_2021, file= "camara_jf/mocoes/exports/mocoes_classificado_2021.csv")
+
+#XLSX
+
+writexl::write_xlsx(mocoes_classificado, path= "camara_jf/mocoes/exports/mocoes_classificado.xlsx")
+writexl::write_xlsx(mocoes_2021, path = "camara_jf/mocoes/exports/mocoes_classificado_2021.xlsx")
 
