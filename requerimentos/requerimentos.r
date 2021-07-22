@@ -78,13 +78,13 @@ requerimentos_classificado %>%
 
 requerimentos_classificado %>%
   filter(ano==2021) %>%
-  select(!ementa) %>%
+  select(!ementa) #%>%
   #view()
   #DT::datatable(extensions= "Responsive")
 
 # Por Autor
 
-requerimentos_autor <- requerimentos_tidy %>%
+requerimentos_autor <- requerimentos_classificado %>%
   mutate(autor = str_split(autor, ",")) %>%
   unnest(autor) %>%
   mutate(autor=str_squish(autor))
@@ -93,7 +93,7 @@ requerimentos_autor <- requerimentos_tidy %>%
 # Filtro de 2021
 
 
-requerimentos_2021 <- requerimentos_tidy %>%
+requerimentos_2021 <- requerimentos_classificado %>%
   filter(ano == 2021)
 
 
@@ -109,27 +109,15 @@ req_autor_2021_count <-requerimentos_autor_2021  %>%
 
 
 
-#Requerimento Discutido
-
-
-#requerimentos_count <- requerimentos_2021 %>%
- # count(ImpactoLegislativo, Tema) %>%
-#  mutate(porcentagem = n/sum(n)) %>%
- # pivot_wider(names_from = Tema, values_from= c(n, porcentagem))
-
-
-# Requerimentos Aprovados
-#requerimentos_count_aprovados <- requerimentos_2021 %>%
-#  filter(Situação == "Aprovado") %>%
-#  count(ImpactoLegislativo, Tema) %>%
-#  mutate(porcentagem = n/sum(n)) %>%
-#  pivot_wider(names_from = Tema, values_from= c(n, porcentagem))
-
+# Requerimento Discutidos e Aprovados não fazem sentido
+# por que todos Requerimentos são aprovados
 
 
 # Visualização ------------------------------------------------------------
 
 library(ggplot2)
+
+# Requerimentos por Autor
 
 vermelho<- "#a50c0c"
 
@@ -142,16 +130,20 @@ req_autor_2021_count %>%
        caption = " Fonte: Câmara JF - Elaboração: JF em Dados")
 
 
-#Por tema
+# Requerimentos por tema
 
 requerimentos_classificado %>%
+  #Filtrando
   filter(ano==2021) %>%
-  mutate(autor = str_split(autor, ",")) %>%
-  unnest(autor) %>%
-  mutate(autor=str_squish(autor))%>%
+  # Unnesting
+      mutate(autor = str_split(autor, ",")) %>%
+      unnest(autor) %>%
+      mutate(autor=str_squish(autor))%>%
+  # Contando
   group_by(tema) %>%
-  count(autor) %>%
-  mutate(autor = forcats::fct_reorder(autor,n)) %>%
+      count(autor) %>%
+      mutate(autor = forcats::fct_reorder(autor,n)) %>%
+  #ggploting
   ggplot(aes(y=autor, x= n, fill= tema)) +
   geom_col( position = "fill", color = "gray20") +
   theme_light() +
@@ -163,99 +155,9 @@ requerimentos_classificado %>%
 # Exporting para Flourish -------------------------------------------------
 
 
+#Número de Requerimentos por Vereador
+
 rio::export( req_autor_2021_count #%>%  pivot_wider(names_from = autor, values_from= n_requerimentos)
             ,file= "camara_jf/requerimentos/exports/requerimentos_por_autor.csv" )
 
 
-
-# Mapa de JF e Lista de Bairros -----------------------------------------------------------
-
-library(tidyverse)
-library(geobr)
-library(sf)
-
-
-##mapa geobr
-
-#juiz_de_fora <- geobr::read_municipality(code_muni = 3136702)
-
-#juiz_de_fora_zonas <- geobr::read_census_tract(code_tract  = 3136702,
-#                                               year = 2000 )
-
-#juiz_de_fora_zonas_urbanas <- geobr::read_census_tract(code_tract  = 3136702,
-#                                                      year = 2000,
-#                                                     zone = "urban" )
-
-#juiz_de_fora_zonas_rurais <- geobr::read_census_tract(code_tract  = 3136702,
-#                                                  year = 2000,
-#                                                   zone = "rural" )
-
-#ggplot() + geom_sf(data= juiz_de_fora_zonas_urbanas,
-#                 fill= "steelblue4",
-#                color= "#FEBF57",
-#               size= .15,
-#              show.legend = F)
-
-#grupamento de bairros IBGE
-
-library(readxl)
-library(ggplot2)
-
-#base_ibge_<- read_excel("base_ibge_setor_censitario_2010_mg.xls")
-
-#saveRDS(Base_informacoes_setores2010_sinopse_MG, file = "base_ibge.rds")
-
-base_ibge_raw <- readRDS("camara_jf/requerimentos/data_raw/base_ibge.rds")
-
-base_ibge_select<- base_ibge_raw %>%
-  select(Cod_setor, Cod_municipio:Nome_do_bairro)
-
-base_ibge_jf<- base_ibge_select%>%
-  filter(Nome_do_municipio == "JUIZ DE FORA") %>%
-  rename(code_tract = Cod_setor)
-
-base_ibge_jf_bairro <- base_ibge_jf %>%
-  janitor::clean_names() %>%
-  group_by( nome_do_municipio, nome_do_subdistrito, nome_do_bairro) %>%
-  count(nome_do_bairro) %>%
-  mutate(nome_do_bairro = paste(
-    "\\b",
-    nome_do_bairro,
-    "\\b",
-    sep = ""))
-
-
-regex_bairros <- base_ibge_jf_bairro %>%
-  pull(nome_do_bairro )
-
-requerimentos_tidy %>%
-  mutate()
-
-
-
-
-#juntando geobr X IBGE com inner_join - DÁ TRUEERRADO 
-
-#juiz_de_fora_agregado_inner <- inner_join(juiz_de_fora_zonas, base_ibge_jf, by= "code_tract")
-
-
-#Cruzando geobr e ibge com full_join
-
-juiz_de_fora_agregado_full <- full_join(juiz_de_fora_zonas, base_ibge_jf, by= "code_tract")
-
-
-# agrupando por nome do bairro
-# st_simplify() deixa o mapa menos detalhado para aumentar em número mais bonito
-
-juiz_de_fora_bairros_full<- juiz_de_fora_agregado_full%>%
-  group_by(Nome_do_bairro)%>%
-  summarize()%>%
-  st_simplify(dTolerance = 0.0007)
-
-# Visualizando
-
-ggplot() + geom_sf(data= juiz_de_fora_bairros_full,
-                   fill= "steelblue4",
-                   color= "#FEBF57",
-                   size= .15,
-                   show.legend = F)
