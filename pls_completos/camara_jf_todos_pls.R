@@ -5,8 +5,6 @@ library(tidyverse)
 library(lubridate)
 library(tidyr)
 library(readxl)
-library(tidyr)
-
 
 # Agora não precisa de Scrapper =D. Câmara fez um "Exportar Excel"
 
@@ -128,19 +126,51 @@ todos_pls_2021_por_autor <- todos_pls_unnest %>%
 
 #Contando por tema  dos apresentados 
 
-todos_pls_2021%>%
-  filter(autor != "Executivo") %>%
-  count(tema) %>%
-  arrange(desc(n)) #%>% view()
-  
+pls_2021_count_tema_apresentados<- todos_pls_2021%>%
+                        count(tema, impacto_legislativo) %>%
+                        mutate(porcentagem = n/sum(n)) %>%
+                        arrange(desc(n))
 
 #Contando por tema por aprovado ou reprovado 
-todos_pls_2021%>%
-  filter(autor != "Executivo") %>%
-   group_by(tema) %>%
-  count(situacao)#%>% view()
+pls_2021_count_tema_aprovados<- todos_pls_2021%>%
+                    filter(situacao == "Aprovado") %>%
+                    count(tema, impacto_legislativo) %>%
+                    mutate(porcentagem = n/sum(n))
+
+# Análises por Vereador, não da Câmara inteira
 
 
+##  Impacto Legislativo por Vereador
+pls_2021_count_impacto_por_vereador <- todos_pls_2021_por_autor%>%
+  group_by(autor)%>%
+  count(impacto_legislativo)%>%
+  mutate(porcentagem = n/sum(n))
+
+
+
+
+# Exporting para flourish -------------------------------------------------
+
+library(writexl)
+#PLs Discutidos
+
+writexl::write_xlsx(pls_2021_count_tema_apresentados %>%
+                      pivot_wider(names_from = tema, values_from= c(n, porcentagem)),
+                    path= "camara_jf/pls_completos/exports/pls_2021_count_temas_apresentados.xlsx")
+
+
+#Pls Aprovados
+
+writexl::write_xlsx(pls_2021_count_tema_aprovados %>%
+                      pivot_wider(names_from = tema, values_from= c(n, porcentagem)),
+                    path= "camara_jf/pls_completos/exports/pls_2021_count_temas_aprovados.xlsx")
+
+
+# Impacto Legislativo por Vereador
+
+writexl::write_xlsx(pls_2021_count_impacto_por_vereador %>%
+                      pivot_wider(names_from = impacto_legislativo, values_from= c(n, porcentagem) ),
+                    path= "camara_jf/pls_completos/exports/pls_2021_count_impacto_por_vereador.xlsx")
 
 
 # Visualização ------------------------------------------------------------
@@ -162,7 +192,7 @@ todos_pls_2021%>%
   ggplot(aes(x=tipo)) + geom_bar() + theme_bw() +
   labs(title= "Relatório 6 Meses da Câmara \nQual Tipos de Projetos de Lei aprovados pela Câmara Municipal de Juiz de Fora?",
        subtitle = "Legislatura 2021/2024 - Desde o início de 2021 - Divididos Autoria Vereadores e Executivo",
-       caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados")
+       caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: JF em Dados")
 
 
 ### Temas das Leis - Sem executivo
@@ -172,7 +202,7 @@ todos_pls_2021%>%
   ggplot(aes(x=tema)) + geom_bar() + theme_bw() +
   labs(title= "Relatório 6 Meses da Câmara \nQual conteúdo dos Projetos de Lei apresentados pela Câmara Municipal de Juiz de Fora?",
        subtitle = "Legislatura 2021/2024 - Autoria do Legislativo, sem Executivo",
-       caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados")
+       caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: JF em Dados")
 
 
 ### Temas das Leis - Com executivo
@@ -180,7 +210,7 @@ todos_pls_2021%>%
   ggplot(aes(x=tema)) + geom_bar() + theme_bw() +
   labs(title= "Relatório 6 Meses da Câmara \nQual conteúdo dos Projetos de Lei apresentados pela Câmara Municipal de Juiz de Fora?",
        subtitle = "Legislatura 2021/2024 -  Autoria do Executivo e Legislativo",
-       caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados")
+       caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: JF em Dados")
 
 #+ geom_text(label = table(leis_2017_2020$Tema))
 
@@ -332,8 +362,3 @@ todos_pls_2021_por_autor %>%
 #grafico de leis inuteis por vereador - facet_Wrap
 #ggplot(todos_pls_2021_por_autor, aes(x=tema, fill = factor( ..count..))) +geom_bar() + 
  # facet_wrap("autor") #+ scale_fill_manual(paleta)
-
-
-
-
-
