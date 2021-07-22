@@ -5,10 +5,6 @@ library(tidyverse)
 library(lubridate)
 library(tidyr)
 library(readxl)
-library(tidyr)
-
-
-
 
 # Agora não precisa de Scrapper =D. Câmara fez um "Exportar Excel"
 
@@ -18,6 +14,8 @@ library(tidyr)
 
 mocoes_raw <- read_delim("camara_jf/mocoes/data_raw/mocoes.csv", 
                      ";", escape_double = FALSE, trim_ws = TRUE)
+
+
 
 
 # Tidying -----------------------------------------------------------------
@@ -37,7 +35,10 @@ tidyer_camara_jf_mocoes <- function(x) {
     janitor::clean_names() %>%
     mutate(ementa_alterada= str_to_lower(str_squish(ementa)),
            situacao = str_replace(situacao,"Aprovado","Aprovada"),
-           situacao = str_replace(situacao, situacao_regex, "Arquivada" ))
+           situacao = str_replace(situacao, situacao_regex, "Arquivada" ),
+           ano= str_replace(ano, "201\\b", "2010") %>%
+             as.numeric()
+           )
 }
 
 
@@ -45,8 +46,11 @@ mocoes_tidy <- mocoes_raw %>%
   tidyer_camara_jf_mocoes()
 
 
+# Tidy vs raw
+table(mocoes_tidy $ situacao)
+table(mocoes_raw $ Situação)
 
-table(mocoes_tidy$ano)
+table(mocoes_tidy $ ano)
 
 
 
@@ -63,25 +67,25 @@ mocoes_classificado <- mocoes_tidy %>%
       str_detect(ementa_alterada, "mo[çc][ãa]o de apoio") ~ "Moção de Apoio",
       TRUE ~ "Não Especificado"),
     tema_especifico = case_when(
-      str_detect(ementa_alterada, "falecimento|morte do|post mortem") ~ "Falecimento",
+      str_detect(ementa_alterada, "falecimento|morte do|post mortem|pesar") ~ "Falecimento",
+      str_detect(ementa_alterada, "anima(l|is)") ~ "Moções à Causa Animal",
       str_detect(ementa_alterada, "atlet|vôlei|basquete|futebol|bom pastor|malha clube|natação|jiu") ~ "Moções a Esportistas",
-      str_detect(ementa_alterada, "lanche|restaurante|pizza|cachorro|hamb|cervej|caf[ée]") ~ "Moções a Restaurantes",
+      str_detect(ementa_alterada, "lanche|restaurante|pizza|cachorro|hamb|cervej|caf[ée]|bar ") ~ "Moções a Restaurantes",
       str_detect(ementa_alterada, "escola[s](?! de samba)|col[eé]gio|professor|alun[oa]|faculdade|universidade") ~ "Moções a Escolas, Prof. e Alunos",
-      str_detect(ementa_alterada, "pol[ií]cia|sgt|sargento|\\bcabo\\b|\\bcb\\b|\\bpm") ~ "Moções a Policiais",
-      str_detect(ementa_alterada, "padre|bispo|pastor|igreja") ~ "Moções a Autoridades Religiosas",
-      str_detect(ementa_alterada, "govern|projeto de lei|\\bpl\\b|\\blula\\b|\\bdilma\\b") ~ "Moções Políticas"
-      #TRUE ~ "Outros"
+      str_detect(ementa_alterada, "pol[ií]cia|sgt|sargento|\\bcabo\\b|\\bcb\\b|\\bpm|soldado") ~ "Moções a Policiais",
+      str_detect(ementa_alterada, "padre|bispo|pastor|igreja|senhor da terra") ~ "Moções a Autoridades Religiosas",
+      str_detect(ementa_alterada, "govern|projeto de lei|\\bpl\\b|\\blula\\b|\\bdilma\\b|movimento negro") ~ "Moções Políticas",
+      str_detect(ementa_alterada, "sindica") ~ "Moções à Sindicatos",
+      str_detect(ementa_alterada, "empres[áa]|material de cons|laboratório|academia|piscinas") ~ "Moções à Empresas",
+      str_detect(ementa_alterada, "covid|saúde|m[ée]dico|ubs|regional leste|pediatra|infecto|hps") ~ "Moções à Autoridade de Saúde",
+      TRUE ~ "Outros"
       ))
 
 
-table(mocoes_classificado$tema_especifico)
+mocoes_classificado %>%
+  count(tema_especifico) %>%
+  arrange(desc(n))
 
-table(mocoes_classificado $ situacao)
-table(mocoes_tidy $ situacao)
-table(mocoes_raw $ Situação)
-
-
-table(mocoes_classificado$tema_especifico)
 
 
 #Moções dividas por cada vereador
@@ -107,8 +111,10 @@ mocoes_2021_por_autor <- mocoes_unnest %>%
 
 mocoes_2021 %>%
   count(tema_especifico) %>%
-  arrange(desc(n)) %>%
-  view()
+  arrange(desc(n)) 
+
+mocoes_2021%>%
+  DT::datatable(extensions= "Responsive")
 
 #%>%
  # mutate(
@@ -148,7 +154,7 @@ ggplot(aes(x=autor, fill= tema_especifico )) +
   labs(title= "Qual o quantidade de Moções apesentadas por Vereador na Câmara JF?",
        subtitle = "Relatório 6 Meses da Câmara -Legislatura 2021-2024", caption = "Fonte: Site Oficial Câmara Municipal - Elaboração e Classificação: Projeto JF em Dados") +
   theme(axis.text.x = element_text(angle = 50, hjust = 1)) +
-  xlab(label = "") + ylab(label = "Número de Moções")
+  xlab(label = "") + ylab(label = "Número de Moções") +
   #scale_y_continuous(name = "Porcentagem entre nº Projetos",
    #                  labels = c("0%","25%", "50%","75%" , "100%")) +
   #scale_fill_manual(values=c( verde, vermelho),
@@ -158,9 +164,10 @@ ggplot(aes(x=autor, fill= tema_especifico )) +
   #geom_hline(yintercept = 0.5, color = "black", linetype = 2) 
 
 
-+ theme(legend.position = "top") 
+ theme(legend.position = "top") 
 
 
+# Geral Tema --------------------------------------------------------------
 
 
 mocoes %>%
@@ -176,8 +183,9 @@ mocoes %>%
 rio::export(mocoes_classificado, file= "camara_jf/mocoes/exports/mocoes_classificado.csv")
 rio::export(mocoes_2021, file= "camara_jf/mocoes/exports/mocoes_classificado_2021.csv")
 
+write_csv(mocoes_2021, file= "camara_jf/mocoes/exports/mocoes_classificado_2021_2.csv")
+
 #XLSX
 
 writexl::write_xlsx(mocoes_classificado, path= "camara_jf/mocoes/exports/mocoes_classificado.xlsx")
 writexl::write_xlsx(mocoes_2021, path = "camara_jf/mocoes/exports/mocoes_classificado_2021.xlsx")
-
