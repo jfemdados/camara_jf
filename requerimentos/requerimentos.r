@@ -117,7 +117,7 @@ req_autor_2021_count <-requerimentos_autor_2021  %>%
 
 library(ggplot2)
 
-# Requerimentos por Autor
+# Gráfico 4A - Requerimentos por Autor
 
 vermelho<- "#a50c0c"
 
@@ -130,7 +130,31 @@ req_autor_2021_count %>%
        caption = " Fonte: Câmara JF - Elaboração: JF em Dados")
 
 
-# Requerimentos por tema
+# 4b -Requerimentos por autor agrupado por tema
+
+requerimentos_classificado %>%
+  #Filtrando
+  filter(ano==2021) %>%
+  # Unnesting
+  mutate(autor = str_split(autor, ",")) %>%
+  unnest(autor) %>%
+  mutate(autor=str_squish(autor))%>%
+  # Contando
+  group_by(tema) %>%
+  count(autor) %>%
+  mutate(autor = forcats::fct_reorder(autor,n)) %>%
+  #ggploting
+  ggplot(aes(y=autor, x= n, fill= tema)) +
+  geom_col( #position = "fill",
+            color = "gray20") +
+  theme_light() +
+  labs(title= "Numero de Requerimentos por Vereador",
+       subtitle= "Na função de fiscalização da Prefeitura, requerimentos são pedidos dos Vereadores à Prefeitura\npara tomar providências",
+       caption = " Fonte: Câmara JF - Elaboração: JF em Dados")
+
+
+
+# 4c -Requerimentos por autor no percentual do tema
 
 requerimentos_classificado %>%
   #Filtrando
@@ -152,6 +176,26 @@ requerimentos_classificado %>%
        caption = " Fonte: Câmara JF - Elaboração: JF em Dados")
 
 
+
+# Requerimentos Total Tema
+
+requerimentos_classificado %>%
+  #Filtrando
+  filter(ano==2021) %>%
+# Contando
+  count(tema) %>%
+  mutate(tema = forcats::fct_reorder(tema,n)) %>%
+  #ggploting
+  ggplot(aes( x=n, y= tema)) +
+  geom_col( #position = "fill",
+            color = "black",  fill= vermelho) +
+  theme_light() +
+  labs(title= "Numero de Requerimentos por Vereador",
+       subtitle= "Na função de fiscalização da Prefeitura, requerimentos são pedidos dos Vereadores à Prefeitura\npara tomar providências",
+       caption = " Fonte: Câmara JF - Elaboração: JF em Dados")
+
+
+
 # Exporting para Flourish -------------------------------------------------
 
 
@@ -159,5 +203,4 @@ requerimentos_classificado %>%
 
 rio::export( req_autor_2021_count #%>%  pivot_wider(names_from = autor, values_from= n_requerimentos)
             ,file= "camara_jf/requerimentos/exports/requerimentos_por_autor.csv" )
-
 
