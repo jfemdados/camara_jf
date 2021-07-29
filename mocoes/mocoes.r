@@ -1,4 +1,4 @@
-# Analisando TODOS PLs da Câmara de Juiz de Fora
+# Analisando TODAS Moções da Câmara de Juiz de Fora
 # Autor: Marcello Filguieras
 
 library(tidyverse)
@@ -152,7 +152,8 @@ ggplot(aes(x=autor, fill= tema_especifico )) +
   geom_bar( width = 0.5, color="black") +
   ggplot2::theme_minimal() + 
   labs(title= "Qual o quantidade de Moções apesentadas por Vereador na Câmara JF?",
-       subtitle = "Relatório 6 Meses da Câmara -Legislatura 2021-2024", caption = "Fonte: Site Oficial Câmara Municipal - Elaboração e Classificação: Projeto JF em Dados") +
+       subtitle = "Relatório 6 Meses da Câmara -Legislatura 2021-2024",
+       caption = "Fonte: Site Oficial Câmara Municipal - Elaboração e Classificação: Projeto JF em Dados") +
   theme(axis.text.x = element_text(angle = 50, hjust = 1)) +
   xlab(label = "") + ylab(label = "Número de Moções") +
   #scale_y_continuous(name = "Porcentagem entre nº Projetos",
@@ -164,16 +165,15 @@ ggplot(aes(x=autor, fill= tema_especifico )) +
   #geom_hline(yintercept = 0.5, color = "black", linetype = 2) 
 
 
- theme(legend.position = "top") 
-
-
 # Geral Tema --------------------------------------------------------------
 
 
-mocoes %>%
-  ggplot( aes(x=tema_especifico, fill= situacao)) + geom_bar(width = 0.7, color= "black")+
+mocoes_2021 %>%
+  ggplot( aes(x=tema_especifico, fill= situacao)) +
+  geom_bar(width = 0.7, color= "black")+
   labs(title= "Relatório 6 Meses da Câmara - Dos PLs apresentados por tema, quais a câmara mais rejeita?",
-       subtitle = "Legislatura de 2021 - Autoria Executivo e Legislativo", caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados") +
+       subtitle = "Legislatura de 2021 - Autoria Executivo e Legislativo",
+       caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados") +
   theme_minimal() + theme(axis.text.x = element_text(angle = 50, hjust = 1))
 
 
