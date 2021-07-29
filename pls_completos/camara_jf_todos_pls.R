@@ -120,7 +120,6 @@ todos_pls_2021_por_autor <- todos_pls_unnest %>%
   )
 
 
-
 # Indicadores - Resultados ------------------------------------------------
 
 
@@ -149,13 +148,28 @@ pls_2021_count_impacto_por_vereador <- todos_pls_2021_por_autor%>%
 
 
 
-# Exporting para flourish -------------------------------------------------
+# Exporting  normal -------------------------------------------------
 
 library(writexl)
+
+
+#### AQUI VALENTIM ESSE QUE TEM QUE IR PRO FLOURISH ##########
+
+writexl::write_xlsx(todos_pls_2021%>%
+                      filter(autor != "Executivo") %>%
+                      filter(tipo == "Projeto de Lei"),
+                    path= "camara_jf/pls_completos/exports/todos_pls_2021_vereadores.xlsx")
+
+
+# Exporting para flourish -------------------------------------------------
+
+
+
 #PLs Discutidos
 
 writexl::write_xlsx(pls_2021_count_tema_apresentados %>%
-                      pivot_wider(names_from = tema, values_from= c(n, porcentagem)),
+                      pivot_wider(names_from = tema, values_from= c(n, porcentagem))
+                    ,
                     path= "camara_jf/pls_completos/exports/pls_2021_count_temas_apresentados.xlsx")
 
 
@@ -195,6 +209,7 @@ todos_pls_2021%>%
        caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: JF em Dados")
 
 
+
 ### Temas das Leis - Sem executivo
 
 todos_pls_2021%>%
@@ -226,7 +241,8 @@ todos_pls_2021%>%
 todos_pls_2021 %>%
   ggplot( aes(x=tema, fill= situacao)) +geom_bar(width = 0.7, color= "black")+
   labs(title= "Relatório 6 Meses da Câmara - Dos PLs apresentados por tema, quais a câmara mais rejeita?",
-       subtitle = "Legislatura de 2021 - Autoria Executivo e Legislativo", caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados") +
+       subtitle = "Legislatura de 2021 - Autoria Executivo e Legislativo",
+       caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados") +
   theme_minimal() + theme(axis.text.x = element_text(angle = 50, hjust = 1)) +
   scale_fill_manual(values=c(verde, azul, amarelo)) +
   scale_x_discrete(name = "Tema dos Projetos",
@@ -258,19 +274,50 @@ todos_pls_2021 %>%
 
 #GRÁFICO VERTICAL
 
-# Grafico Leis Apresentados por Tema
+# Grafico Leis Apresentados por Tema - Com Executivo
 
 todos_pls_2021%>%
   #filter(autor != "Executivo") %>%
   ggplot(aes(x=impacto_legislativo, fill= tema)) + geom_bar(color= "black", width = 0.5) +
   theme_minimal() +
   labs(title= "Relatório 6 Meses da Câmara\nQual conteúdo dos Projetos de Lei Apresentados pela Câmara Municipal de Juiz de Fora?",
-       subtitle = "Legislatura 2021-2024 - Restrito aos PLs de Autoria dos próprios vereadores, excluidos os de autoria do Executivo",
+       subtitle = "Legislatura 2021-2024 - Autoria dos Vereadores e Executivo",
        caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados") +
   scale_x_discrete(name = "", 
                    labels = c("Legislação Simbólica ou Irrelevante",
                               "Outros Projetos em Geral")) +
-  ylab(label = "Nº de Projetos Apresentados") +
+  scale_y_continuous(name = "Nº de Projetos Apresentados",
+                     #limits = c(0,150)
+                     ) +
+  scale_fill_discrete(name= "Tema de Projeto",
+                      labels= c("Criação de Dias Comemorativos",
+                                "Concessão de título de Cidadão honorário",
+                                "Alteração de Nomes de Prédios",
+                                "Alteração de Nomes de Ruas",
+                                "Outros PLs em Geral"))
+todos_pls_2021%>%
+  #filter(autor != "Executivo") %>%
+  count(tema, impacto_legislativo) %>%
+  mutate(porcentagem = n/sum(n))
+
+
+############### AQUI VALENTIM ESSE QUE TEM QUE IR PRO FLOURISH - 
+
+#Sem Executivo
+
+todos_pls_2021%>%
+  filter(autor != "Executivo") %>%
+  filter(tipo == "Projeto de Lei") %>%
+  ggplot(aes(x=impacto_legislativo, fill= tema)) + geom_bar(color= "black", width = 0.5) +
+  theme_minimal() +
+  labs(title= "Relatório 6 Meses da Câmara\nQual conteúdo dos Projetos de Lei Apresentados pela Câmara Municipal de Juiz de Fora?",
+       subtitle = "Legislatura 2021-2024 - Somente PLs ordinários deAutoria dos Vereadores,  excluido os Executivos e LC") +
+  scale_x_discrete(name = "", 
+                   labels = c("Legislação Simbólica ou Irrelevante",
+                              "Outros Projetos em Geral")) +
+  scale_y_continuous(name = "Nº de Projetos Apresentados",
+                     #limits = c(0,150)
+                     )+
   scale_fill_discrete(name= "Tema de Projeto",
                       labels= c("Criação de Dias Comemorativos",
                                 "Concessão de título de Cidadão honorário",
@@ -278,6 +325,11 @@ todos_pls_2021%>%
                                 "Alteração de Nomes de Ruas",
                                 "Outros PLs em Geral"))
 
+todos_pls_2021%>%
+  filter(autor != "Executivo") %>%
+  filter(tipo == "Projeto de Lei") %>%
+  count(tema, impacto_legislativo) %>%
+  mutate(porcentagem = n/sum(n))
 
 # Grafico Leis Aprovados por Tema
 
