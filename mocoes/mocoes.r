@@ -155,7 +155,7 @@ ggplot(aes(x=autor, fill= tema_especifico )) +
        subtitle = "Relatório 6 Meses da Câmara -Legislatura 2021-2024",
        caption = "Fonte: Site Oficial Câmara Municipal - Elaboração e Classificação: Projeto JF em Dados") +
   theme(axis.text.x = element_text(angle = 50, hjust = 1)) +
-  xlab(label = "") + ylab(label = "Número de Moções") +
+  xlab(label = "") + ylab(label = "Número de Moções") 
   #scale_y_continuous(name = "Porcentagem entre nº Projetos",
    #                  labels = c("0%","25%", "50%","75%" , "100%")) +
   #scale_fill_manual(values=c( verde, vermelho),
