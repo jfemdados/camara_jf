@@ -1,4 +1,4 @@
-# Analisando TODAS Moções da Câmara de Juiz de Fora
+# Analisando TODOS PLs da Câmara de Juiz de Fora
 # Autor: Marcello Filguieras
 
 library(tidyverse)
@@ -77,7 +77,7 @@ mocoes_classificado <- mocoes_tidy %>%
       str_detect(ementa_alterada, "govern|projeto de lei|\\bpl\\b|\\blula\\b|\\bdilma\\b|movimento negro") ~ "Moções Políticas",
       str_detect(ementa_alterada, "sindica") ~ "Moções à Sindicatos",
       str_detect(ementa_alterada, "empres[áa]|material de cons|laboratório|academia|piscinas") ~ "Moções à Empresas",
-      str_detect(ementa_alterada, "covid|saúde|m[ée]dico|ubs|regional leste|pediatra|infecto|hps") ~ "Moções à Autoridade de Saúde",
+      str_detect(ementa_alterada, "covid|saúde|m[ée]dico|ubs|regional leste|pediatra|infecto|hps") ~ "Moções à Médicos",
       TRUE ~ "Outros"
       ))
 
@@ -109,12 +109,8 @@ mocoes_2021 <- mocoes_classificado %>%
 mocoes_2021_por_autor <- mocoes_unnest %>%
   filter(ano == 2021)
 
-mocoes_2021 %>%
-  count(tema_especifico) %>%
-  arrange(desc(n)) 
-
-mocoes_2021%>%
-  DT::datatable(extensions= "Responsive")
+#mocoes_2021%>%
+ # DT::datatable(extensions= "Responsive")
 
 #%>%
  # mutate(
@@ -140,6 +136,28 @@ mocoes_2021%>%
   count(situacao)#%>% view()
 
 
+#Moções por grande tema Vereador
+mocoes_2021_g_tema_autor<-mocoes_2021_por_autor %>%
+  group_by(grande_tema) %>%
+  count(autor) %>%
+  pivot_wider(names_from = grande_tema, values_from = n)
+
+#Export
+
+writexl::write_xlsx(mocoes_2021_por_autor %>%
+                      count(autor) %>%
+                      arrange(desc(n)),
+                 path= "camara_jf/mocoes/exports/mocoes_por_autor_2021.xlsx")
+
+
+writexl::write_xlsx(mocoes_2021_g_tema_autor,
+                    path= "camara_jf/mocoes/exports/mocoes_2021_g_tema_autor.xlsx")
+
+
+writexl::write_xlsx(mocoes_2021%>%
+                      count(tema_especifico) %>%
+                      arrange(desc(n)),
+                path= "camara_jf/mocoes/exports/mocoes_2021_temas.xlsx")
 
 
 # Visualização ----------------------------------------------------------------
@@ -148,14 +166,14 @@ mocoes_2021%>%
 # Por Vereador ------------------------------------------------------------
 
 mocoes_2021_por_autor%>%
-ggplot(aes(x=autor, fill= tema_especifico )) +
-  geom_bar( width = 0.5, color="black") +
+ggplot(aes(y=autor, fill= tema_especifico )) +
+  geom_bar( width = 0.5, color="black", position = "fill") +
   ggplot2::theme_minimal() + 
   labs(title= "Qual o quantidade de Moções apesentadas por Vereador na Câmara JF?",
        subtitle = "Relatório 6 Meses da Câmara -Legislatura 2021-2024",
        caption = "Fonte: Site Oficial Câmara Municipal - Elaboração e Classificação: Projeto JF em Dados") +
   theme(axis.text.x = element_text(angle = 50, hjust = 1)) +
-  xlab(label = "") + ylab(label = "Número de Moções") 
+  xlab(label = "") + ylab(label = "Número de Moções")
   #scale_y_continuous(name = "Porcentagem entre nº Projetos",
    #                  labels = c("0%","25%", "50%","75%" , "100%")) +
   #scale_fill_manual(values=c( verde, vermelho),
@@ -165,13 +183,15 @@ ggplot(aes(x=autor, fill= tema_especifico )) +
   #geom_hline(yintercept = 0.5, color = "black", linetype = 2) 
 
 
+
+
 # Geral Tema --------------------------------------------------------------
 
 
 mocoes_2021 %>%
-  ggplot( aes(x=tema_especifico, fill= situacao)) +
-  geom_bar(width = 0.7, color= "black")+
-  labs(title= "Relatório 6 Meses da Câmara - Dos PLs apresentados por tema, quais a câmara mais rejeita?",
+  ggplot( aes(x=tema_especifico)) +
+  geom_bar(width = 0.7, fill = "#ac050c", color= "black")+
+  labs(title= "Relatório 6 Meses da Câmara - Tema das Moções",
        subtitle = "Legislatura de 2021 - Autoria Executivo e Legislativo",
        caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados") +
   theme_minimal() + theme(axis.text.x = element_text(angle = 50, hjust = 1))
