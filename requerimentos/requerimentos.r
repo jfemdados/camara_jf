@@ -61,8 +61,8 @@ requerimentos_classificado <- requerimentos_tidy %>%
     str_detect(ementa_alterada, "buraco|esc[oó]ria|asf[áa]lt|tampa|cascalh|patrol") ~ "Tapar Buracos e Asfaltamento",
     str_detect(ementa_alterada, "m[ée]dico|\\bubs\\b|sa[úu]de|vacina|covid") ~  "Saúde e Vacinação",
     str_detect(ementa_alterada, "ilumina[cç][aã]o|poste|l[âa]mpada|\\bled\\b") ~ "Troca de Lâmpadas em Postes",
-    str_detect(ementa_alterada, "\\blinha\\b|[ôo]nibus") ~ "Ônibus e Transporte Público",
-    str_detect(ementa_alterada, "transito|trânsito|mão dupla|mão única|radar|quebra[- ]molas|pedestre|redutor(es)* de velocidade|sinal|placa|rotat[óo]ria") ~ "Trânsito",
+    str_detect(ementa_alterada, "\\blinha\\b|[ôo]nibus|transporte p[úu]blico") ~ "Ônibus e Transporte Público",
+    str_detect(ementa_alterada, "transito|trânsito|mão dupla|mão única|radar|quebra[- ]mola|pedestre|redutor(es)* de velocidade|sinal|placa|rotat[óo]ria|sem[áa]foro") ~ "Trânsito",
     str_detect(ementa_alterada, "esgoto|\\b[aá]gua|canal|manilha") ~ "Saneamento Básico",
     str_detect(ementa_alterada, "limpeza|entulho|boca de lobo") ~ "Limpeza de Vias Públicas",
     str_detect(ementa_alterada, "pavimenta[cç][aã]o") ~ "Tapar Buracos e Asfaltamento",
@@ -82,7 +82,7 @@ requerimentos_classificado %>%
   #view()
   #DT::datatable(extensions= "Responsive")
 
-# Por Autor
+# Por Autor -  Unnesting os Requerimentos em Conjunto
 
 requerimentos_autor <- requerimentos_classificado %>%
   mutate(autor = str_split(autor, ",")) %>%
@@ -100,12 +100,6 @@ requerimentos_2021 <- requerimentos_classificado %>%
 requerimentos_autor_2021 <- requerimentos_autor %>%
   filter(ano == 2021)
 
-req_autor_2021_count <-requerimentos_autor_2021  %>%
-  count(autor, name = "n_requerimentos") %>%
-  arrange(desc(n_requerimentos)) %>%
-  mutate(
-   autor = forcats::fct_reorder(autor,
-                                n_requerimentos))
 
 
 
@@ -118,6 +112,15 @@ req_autor_2021_count <-requerimentos_autor_2021  %>%
 library(ggplot2)
 
 # Gráfico 4A - Requerimentos por Autor
+
+req_autor_2021_count <- requerimentos_autor %>%
+  filter(ano == 2021) %>%
+  count(autor, name = "n_requerimentos") %>%
+  arrange(desc(n_requerimentos)) %>%
+  mutate(
+   autor = forcats::fct_reorder(autor,
+                                n_requerimentos))
+
 
 vermelho<- "#a50c0c"
 
@@ -132,18 +135,21 @@ req_autor_2021_count %>%
 
 # 4b -Requerimentos por autor agrupado por tema
 
-requerimentos_classificado %>%
+
+#counting 
+
+req_autor_tema_2021_count <- requerimentos_autor %>%
   #Filtrando
-  filter(ano==2021) %>%
-  # Unnesting
-  mutate(autor = str_split(autor, ",")) %>%
-  unnest(autor) %>%
-  mutate(autor=str_squish(autor))%>%
+  filter(ano == 2021) %>%
   # Contando
   group_by(tema) %>%
   count(autor) %>%
-  mutate(autor = forcats::fct_reorder(autor,n)) %>%
-  #ggploting
+  #Ordenando para o GGplot
+  mutate(autor = forcats::fct_reorder(autor,n))
+
+#ggploting
+
+req_autor_tema_2021_count %>%
   ggplot(aes(y=autor, x= n, fill= tema)) +
   geom_col( #position = "fill",
             color = "gray20") +
@@ -156,17 +162,8 @@ requerimentos_classificado %>%
 
 # 4c -Requerimentos por autor no percentual do tema
 
-requerimentos_classificado %>%
-  #Filtrando
-  filter(ano==2021) %>%
-  # Unnesting
-      mutate(autor = str_split(autor, ",")) %>%
-      unnest(autor) %>%
-      mutate(autor=str_squish(autor))%>%
-  # Contando
-  group_by(tema) %>%
-      count(autor) %>%
-      mutate(autor = forcats::fct_reorder(autor,n)) %>%
+
+req_autor_tema_2021_count %>%
   #ggploting
   ggplot(aes(y=autor, x= n, fill= tema)) +
   geom_col( position = "fill", color = "gray20") +
@@ -177,14 +174,17 @@ requerimentos_classificado %>%
 
 
 
-# Requerimentos Total Tema
+# 4d - Requerimentos Total Tema
 
-requerimentos_classificado %>%
+
+req_tema_2021_count <- requerimentos_classificado %>%
   #Filtrando
   filter(ano==2021) %>%
-# Contando
+  # Contando
   count(tema) %>%
-  mutate(tema = forcats::fct_reorder(tema,n)) %>%
+  mutate(tema = forcats::fct_reorder(tema,n))
+
+req_tema_2021_count%>%
   #ggploting
   ggplot(aes( x=n, y= tema)) +
   geom_col( #position = "fill",
@@ -203,4 +203,18 @@ requerimentos_classificado %>%
 
 rio::export( req_autor_2021_count #%>%  pivot_wider(names_from = autor, values_from= n_requerimentos)
             ,file= "camara_jf/requerimentos/exports/requerimentos_por_autor.csv" )
+
+
+writexl::write_xlsx(requerimentos_autor_2021%>%
+                      # Contando
+                      group_by(tema) %>%
+                      count(autor) %>%
+                      mutate(autor = forcats::fct_reorder(autor,n)) %>%
+                      arrange(desc(n))%>%
+                      pivot_wider(names_from = autor, values_from= n),
+                    path = "camara_jf/requerimentos/exports/requerimentos_tema_por_autor_2.xlsx" )
+
+writexl::write_xlsx(req_tema_2021_count #%>%pivot_wider(names_from = autor, values_from= n)
+                      ,
+                    path = "camara_jf/requerimentos/exports/requerimentos_tema.xlsx" )
 
