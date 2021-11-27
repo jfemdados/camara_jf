@@ -8,7 +8,7 @@ No estado atual, dividimos as pastas em:
 
 1) __pls_completos__ temos todos os PLs disponíveis no sistemas, faxinados e com nossa classificação de PLs Inúteis, digo de Baixo Impacto;
 2) __mocoes__ temos todas as Moções de Aplauso ou pesar, parabéns que os vereadores dão a certas pessoas da cidade. Dados faxinados e um pouco classificadas.
-3) _requeriementos_ temos todos os requerimentos, pedidos à prefeitura. Dados faxinados e satisfatóriamente faxinados.
+3) __requeriementos__ temos todos os requerimentos, pedidos à prefeitura. Dados faxinados e satisfatóriamente faxinados.
 
 Inicialmente, a ideia era pegar os projetos aprovado, diretamente pelo sistema da prefeitura sobre legislação municipal, o [JFLegis](https://jflegis.pjf.mg.gov.br/indexConsulta.php#tbr). É o que está nessa pasta inicial _jf_legis_.
 
