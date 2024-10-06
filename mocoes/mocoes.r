@@ -34,7 +34,10 @@ tidyer_camara_jf_mocoes <- function(x) {
            situacao = str_replace(situacao,"Aprovado","Aprovada"),
            situacao = str_replace(situacao, situacao_regex, "Arquivada" ),
            ano= str_replace(ano, "201\\b", "2010") %>%
-             as.numeric()
+               as.numeric(),
+           autor = str_replace(autor,
+                               "Luiz Otávio Fernandes Coelho - Pardal",
+                               "Pardal")
            )
 }
 
@@ -176,6 +179,9 @@ mocoes_2124_g_tema_autor <- mocoes_2124_por_autor %>%
 #writexl::write_xlsx(mocoes_2124 %>% count(ano),
  #                   path= "camara_jf/2024/exports/mocoes_2124_ano.xlsx")
 
+writexl::write_xlsx(mocoes_2124,
+             path= "camara_jf/2024/exports/mocoes_2124_tabela_completa.xlsx")
+
 
 # Visualização ----------------------------------------------------------------
 
@@ -219,7 +225,7 @@ mocoes_2124_por_autor%>%
 mocoes_2124 %>%
   ggplot( aes(y=tema_especifico)) +
   geom_bar(width = 0.7, fill = "#ac050c", color= "black")+
-  labs(title= "4 anos de Câmara Municipal - Temas da Moções",
+  labs(title= "4 anos deCâmara Municipal - Temas da Moções",
        subtitle = "Legislatura de 2021-2024",
        caption = "Fonte: Site Oficial Câmara Municipal \n Elaboração e Classificação: Projeto JF em Dados") +
   theme_minimal() + theme(axis.text.x = element_text(angle = 50, hjust = 1))
